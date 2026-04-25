@@ -630,14 +630,30 @@ export function ChatWindow() {
 
   return (
     <main className="relative flex h-full min-w-0 flex-1 flex-col bg-background">
+      {/* Session topbar */}
       <div className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-divider px-6">
-        <h2 className="truncate font-medium text-foreground">{sessionTitle}</h2>
-        <p className="shrink-0 text-sm text-muted-foreground">
-          Spent: <span className="font-mono text-payment">{totalSpent}</span> |{" "}
-          <span className="font-mono text-foreground">
-            {apiCalls} APIs called
-          </span>
-        </p>
+        <h2 className="truncate text-sm font-medium text-foreground/70">
+          {sessionTitle}
+        </h2>
+        <div className="flex shrink-0 items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+              Spent
+            </span>
+            <span className="font-mono text-sm font-medium text-payment">
+              {totalSpent}
+            </span>
+          </div>
+          <span className="text-muted-foreground/20">·</span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-sm font-medium text-foreground/80">
+              {apiCalls}
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+              APIs called
+            </span>
+          </div>
+        </div>
       </div>
 
       <ChatContainerRoot className="min-h-0 flex-1">

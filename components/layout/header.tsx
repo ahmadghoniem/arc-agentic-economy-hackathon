@@ -28,25 +28,32 @@ export function Header() {
   }
 
   return (
-    <header className="relative z-20 flex h-13 flex-none items-center justify-between border-b border-divider bg-background px-4">
-      <div className="flex w-60 items-center gap-3">
-        <h1 className="font-semibold tracking-wide text-foreground">
-          OmniClaw Console
+    <header className="relative z-20 flex h-12 flex-none items-center border-b border-divider bg-background px-4">
+      {/* Brand — left */}
+      <div className="flex w-[280px] flex-none items-center gap-2.5">
+        <span className="relative flex size-1.5">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+          <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+        </span>
+        <h1 className="text-sm font-semibold tracking-wide text-foreground uppercase">
+          Omniclaw
         </h1>
-        <span className="relative flex size-2">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
-          <span className="relative inline-flex size-2 rounded-full bg-primary" />
+        <span className="rounded border border-divider px-1.5 py-px text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+          Console
         </span>
       </div>
 
-      <div className="hidden items-center gap-6 lg:flex">
-        {eoaBalance ? <WalletBalanceBadge {...eoaBalance} /> : null}
-        {gatewayBalance ? (
-          <GatewayBalanceControl
-            label={gatewayBalance.label}
-            amount={gatewayBalance.amount}
-          />
-        ) : null}
+      {/* Wallet controls — center */}
+      <div className="flex flex-1 items-center justify-center gap-3">
+        <div className="hidden items-center gap-2 lg:flex">
+          {eoaBalance ? <WalletBalanceBadge {...eoaBalance} /> : null}
+          {gatewayBalance ? (
+            <GatewayBalanceControl
+              label={gatewayBalance.label}
+              amount={gatewayBalance.amount}
+            />
+          ) : null}
+        </div>
         <Tooltip>
           <TooltipTrigger
             render={
@@ -56,12 +63,12 @@ export function Header() {
                 size="icon"
                 disabled={isRefreshing}
                 onClick={refreshBalances}
-                className="rounded-full text-muted-foreground hover:bg-card hover:text-foreground"
+                className="size-7 rounded-full text-muted-foreground hover:bg-card hover:text-foreground"
               />
             }
           >
             <ArrowsClockwiseIcon
-              size={16}
+              size={14}
               weight="bold"
               className={cn(isRefreshing && "animate-spin")}
             />
@@ -71,7 +78,8 @@ export function Header() {
         </Tooltip>
       </div>
 
-      <div className="flex w-60 items-center justify-end gap-2">
+      {/* Status — right */}
+      <div className="flex w-[260px] flex-none items-center justify-end">
         <SystemsPopover />
       </div>
     </header>

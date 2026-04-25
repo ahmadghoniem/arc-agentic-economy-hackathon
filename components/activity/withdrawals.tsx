@@ -3,54 +3,59 @@
 import { ArrowUpIcon } from "@phosphor-icons/react"
 
 import { withdrawalActivity } from "@/components/activity/activity-data"
-import { CopyButton, StatusDot } from "@/components/shared/shared"
+import { CopyButton } from "@/components/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function Withdrawals() {
   return (
-    <section>
-      <div className="flex flex-col gap-3">
-        {withdrawalActivity.map((activity) => {
-          const amount = (activity.rawAmount / 1000000).toFixed(2)
+    <div className="space-y-px">
+      {withdrawalActivity.map((activity) => {
+        const amount = (activity.rawAmount / 1000000).toFixed(2)
+        const isPending = activity.status !== "completed"
 
-          return (
-            <div key={activity.hash} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <div className="flex min-w-0 items-center gap-1.5">
-                  <ArrowUpIcon size={14} className="text-muted-foreground" />
-                  <span className="text-foreground">Withdrawal</span>
-                  <StatusDot
-                    className={
-                      activity.status === "completed"
-                        ? "bg-success"
-                        : "bg-pending"
-                    }
-                    pulse={activity.status !== "completed"}
-                  />
-                </div>
+        return (
+          <div
+            key={activity.hash}
+            className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+          >
+            {/* Direction icon */}
+            <ArrowUpIcon
+              size={12}
+              weight="bold"
+              className="mt-px flex-none self-start text-muted-foreground/60"
+            />
+
+            {/* Label + hash */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] text-foreground/80">Withdraw</span>
                 <span
                   className={cn(
-                    "ml-2 flex-none font-mono text-sm text-muted-foreground"
+                    "size-1.5 rounded-full",
+                    isPending ? "animate-pulse bg-pending" : "bg-success"
                   )}
-                >
-                  -{amount} USDC
-                </span>
+                />
               </div>
-              <div className="flex items-center justify-between pl-5.5">
-                <div className="flex items-center gap-1">
-                  <span className="font-mono text-sm text-muted-foreground">
-                    {activity.hash}
-                  </span>
-                  <CopyButton value={activity.hash} label="Copy hash" />
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {activity.time}
+              <div className="mt-0.5 flex items-center gap-1">
+                <span className="font-mono text-[11px] text-muted-foreground/50">
+                  {activity.hash}
                 </span>
+                <CopyButton value={activity.hash} label="Copy hash" />
               </div>
             </div>
-          )
-        })}
-      </div>
-    </section>
+
+            {/* Amount + time */}
+            <div className="flex-none text-right">
+              <p className="font-mono text-[12px] font-medium text-muted-foreground">
+                -{amount}
+              </p>
+              <p className="text-[11px] text-muted-foreground/50">
+                {activity.time}
+              </p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
   )
 }

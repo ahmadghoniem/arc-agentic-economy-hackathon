@@ -1,91 +1,43 @@
 "use client"
 
-import { MagnifyingGlassIcon } from "@phosphor-icons/react"
+import { ArrowUpRightIcon } from "@phosphor-icons/react"
 
 import { services } from "@/components/services/service-data"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 
 export function ServiceCatalog() {
   return (
-    <section>
-      <div className="mb-3">
-        <h2 className="font-semibold text-foreground">Seller Services</h2>
-        <p className="text-sm text-muted-foreground">Paid API Endpoints</p>
-      </div>
-      <div className="space-y-3">
-        {services.map((service) => (
-          <Card
-            key={service.name}
-            size="sm"
-            className="border border-divider bg-card text-card-foreground ring-0"
-          >
-            <CardHeader className="px-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <CardTitle className="font-semibold text-foreground">
-                    {service.name}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-1 text-sm text-muted-foreground">
-                    {service.desc}
-                  </CardDescription>
-                </div>
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        variant="ghost"
-                        className="text-muted-foreground hover:bg-card hover:text-foreground"
-                      />
-                    }
-                  >
-                    <MagnifyingGlassIcon size={14} />
-                    <span className="sr-only">Inspect endpoint</span>
-                  </TooltipTrigger>
-                  <TooltipContent>Inspect endpoint</TooltipContent>
-                </Tooltip>
-              </div>
-            </CardHeader>
-            <CardContent className="flex items-center justify-between px-3">
-              <div className="flex gap-1.5">
-                <Badge
-                  variant="outline"
-                  className="h-5 rounded-sm border-success/30 bg-transparent text-success"
-                >
-                  online
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="h-5 rounded-sm border-service/30 bg-transparent text-service"
-                >
-                  x402
-                </Badge>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                from{" "}
-                <span className="font-mono text-payment">
-                  ${service.price}
-                </span>{" "}
-                / call
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+    <div className="space-y-px">
+      {services.map((service) => (
+        <div
+          key={service.name}
+          className="group flex cursor-default items-start justify-between gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+        >
+          {/* Left: status dot + name + desc */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="size-1.5 flex-none rounded-full bg-success" />
+              <span className="truncate text-sm font-medium text-foreground/90">
+                {service.name}
+              </span>
+              <ArrowUpRightIcon
+                size={10}
+                className="flex-none text-muted-foreground/0 transition-colors group-hover:text-muted-foreground/60"
+              />
+            </div>
+            <p className="mt-0.5 truncate pl-3 text-[11px] text-muted-foreground/60">
+              {service.desc}
+            </p>
+          </div>
+
+          {/* Right: price */}
+          <div className="flex-none pt-0.5 text-right">
+            <span className="font-mono text-[11px] text-payment">
+              ${service.price}
+            </span>
+            <p className="text-[10px] text-muted-foreground/50">/ call</p>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
