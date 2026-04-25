@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  ArrowsHorizontal,
-  Gauge,
-  Lock,
-  ShieldCheck,
-  UsersThree,
-  Wallet,
+  ArrowsHorizontalIcon,
+  GaugeIcon,
+  LockIcon,
+  ShieldCheckIcon,
+  UsersThreeIcon,
+  WalletIcon,
   type Icon,
 } from "@phosphor-icons/react"
 
@@ -16,11 +16,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 const guardIcons: Record<GuardIcon, Icon> = {
-  wallet: Wallet,
-  "arrows-horizontal": ArrowsHorizontal,
-  gauge: Gauge,
-  "users-three": UsersThree,
-  "shield-check": ShieldCheck,
+  wallet: WalletIcon,
+  "arrows-horizontal": ArrowsHorizontalIcon,
+  gauge: GaugeIcon,
+  "users-three": UsersThreeIcon,
+  "shield-check": ShieldCheckIcon,
 }
 
 export function ActiveGuards() {
@@ -28,8 +28,8 @@ export function ActiveGuards() {
     <Card className="border border-divider bg-card py-4 text-card-foreground ring-0">
       <CardHeader className="px-4">
         <div className="flex items-center gap-2">
-          <Lock size={12} weight="bold" className="text-success" />
-          <CardTitle className="flex-1 text-xs tracking-widest text-muted-foreground uppercase">
+          <LockIcon size={12} weight="bold" className="text-success" />
+          <CardTitle className="flex-1 text-sm tracking-widest text-muted-foreground uppercase">
             Active Guards
           </CardTitle>
         </div>
@@ -48,11 +48,11 @@ export function ActiveGuards() {
                   <span className="flex size-5 items-center justify-center rounded-sm bg-accent/80 text-muted-foreground">
                     <GuardIcon size={12} weight="duotone" />
                   </span>
-                  <span className="truncate text-[11px] font-medium text-foreground">
+                  <span className="truncate text-sm font-medium text-foreground">
                     {guard.label}
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-payment">
+                <span className="font-mono text-sm text-payment">
                   {guard.value}
                 </span>
               </div>
@@ -67,7 +67,7 @@ export function ActiveGuards() {
                   />
                 </div>
               ) : null}
-              <p className="mt-1.5 text-[10px] text-muted-foreground">
+              <p className="mt-1.5 text-xs text-muted-foreground">
                 {guard.helper}
               </p>
             </div>

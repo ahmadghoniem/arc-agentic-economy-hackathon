@@ -17,8 +17,8 @@ export function WalletBalanceBadge({
   return (
     <div className="flex h-8 items-center gap-2 rounded-full border border-divider bg-card px-3">
       <StatusDot className={statusColor} />
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <span className="ml-1 font-mono text-xs text-payment">{amount}</span>
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+      <span className="ml-1 font-mono text-sm text-payment">{amount}</span>
       {copyValue ? (
         <CopyButton value={copyValue} label={`Copy ${label}`} />
       ) : null}

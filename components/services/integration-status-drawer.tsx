@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import {
-  CaretDown,
-  CaretUp,
-  CheckCircle,
-  WifiHigh,
-  XCircle,
+  CaretDownIcon,
+  CaretUpIcon,
+  CheckCircleIcon,
+  WifiHighIcon,
+  XCircleIcon,
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
@@ -36,7 +36,7 @@ const integrationRows = [
 
 export function IntegrationStatusDrawer() {
   const [isOpen, setIsOpen] = React.useState(true)
-  const ToggleIcon = isOpen ? CaretDown : CaretUp
+  const ToggleIcon = isOpen ? CaretDownIcon : CaretUpIcon
 
   return (
     <section className="border-t border-divider bg-background px-4 py-3">
@@ -45,8 +45,8 @@ export function IntegrationStatusDrawer() {
         onClick={() => setIsOpen((current) => !current)}
         className="flex w-full items-center justify-between gap-3 text-left"
       >
-        <span className="flex items-center gap-2 text-xs font-medium text-foreground">
-          <WifiHigh size={14} weight="bold" className="text-success" />
+        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <WifiHighIcon size={14} weight="bold" className="text-success" />
           Integration Status
         </span>
         <ToggleIcon size={13} className="text-muted-foreground" />
@@ -55,14 +55,14 @@ export function IntegrationStatusDrawer() {
       {isOpen ? (
         <div className="mt-3 border-t border-divider pt-3">
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">OmniClaw</h3>
-            <CheckCircle size={14} weight="fill" className="text-success" />
+            <h3 className="font-semibold text-foreground">OmniClaw</h3>
+            <CheckCircleIcon size={14} weight="fill" className="text-success" />
           </div>
           <div className="space-y-2">
             {integrationRows.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-3 text-xs"
+                className="flex items-center justify-between gap-3 text-sm"
               >
                 <span className="min-w-0 truncate text-muted-foreground">
                   {row.label}
@@ -82,8 +82,8 @@ export function IntegrationStatusDrawer() {
 
 function StatusIcon({ status }: { status: string }) {
   if (status === "success") {
-    return <CheckCircle size={13} weight="fill" className="text-success" />
+    return <CheckCircleIcon size={13} weight="fill" className="text-success" />
   }
 
-  return <XCircle size={13} className={cn("text-muted-foreground")} />
+  return <XCircleIcon size={13} className={cn("text-muted-foreground")} />
 }

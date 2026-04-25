@@ -1,6 +1,6 @@
 "use client"
 
-import { MagnifyingGlass } from "@phosphor-icons/react"
+import { MagnifyingGlassIcon } from "@phosphor-icons/react"
 
 import { services } from "@/components/services/service-data"
 import { Badge } from "@/components/ui/badge"
@@ -34,10 +34,10 @@ export function ServiceCatalogSheet() {
       <SheetHeader className="border-b border-divider p-4">
         <div className="flex items-start justify-between gap-3 pr-8">
           <div>
-            <SheetTitle className="text-sm font-semibold text-foreground">
+            <SheetTitle className="font-semibold text-foreground">
               Service Catalog
             </SheetTitle>
-            <SheetDescription className="text-xs text-muted-foreground">
+            <SheetDescription className="text-sm text-muted-foreground">
               Paid API Endpoints
             </SheetDescription>
           </div>
@@ -54,10 +54,10 @@ export function ServiceCatalogSheet() {
               <CardHeader className="px-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <CardTitle className="text-sm font-semibold text-foreground">
+                    <CardTitle className="font-semibold text-foreground">
                       {service.name}
                     </CardTitle>
-                    <CardDescription className="line-clamp-1 text-xs text-muted-foreground">
+                    <CardDescription className="line-clamp-1 text-sm text-muted-foreground">
                       {service.desc}
                     </CardDescription>
                   </div>
@@ -72,7 +72,7 @@ export function ServiceCatalogSheet() {
                         />
                       }
                     >
-                      <MagnifyingGlass size={14} />
+                      <MagnifyingGlassIcon size={14} />
                       <span className="sr-only">Inspect endpoint</span>
                     </TooltipTrigger>
                     <TooltipContent>Inspect endpoint</TooltipContent>
@@ -94,7 +94,7 @@ export function ServiceCatalogSheet() {
                     x402
                   </Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-sm text-muted-foreground">
                   from{" "}
                   <span className="font-mono text-payment">
                     ${service.price}

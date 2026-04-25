@@ -6,8 +6,16 @@ export type ApiPayment = {
   status: "completed" | "pending"
 }
 
-export type FundActivity = {
-  type: "Deposit" | "Withdraw"
+export type DepositActivity = {
+  type: "Deposit"
+  rawAmount: number
+  status: "completed" | "pending"
+  hash: string
+  time: string
+}
+
+export type WithdrawalActivity = {
+  type: "Withdraw"
   rawAmount: number
   status: "completed" | "pending"
   hash: string

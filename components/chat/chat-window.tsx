@@ -2,13 +2,13 @@
 
 import * as React from "react"
 import {
-  ArrowsSplit,
-  Brain,
-  CheckCircle,
-  Circle,
-  PaperPlaneRight,
-  Shuffle,
-  WarningCircle,
+  ArrowsSplitIcon,
+  BrainIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  PaperPlaneRightIcon,
+  ShuffleIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react"
 
 import {
@@ -237,10 +237,8 @@ function AgentExecutionTrace({ steps }: { steps: TraceStep[] }) {
     <section className="w-full max-w-xl rounded-lg border border-divider bg-card p-4 text-card-foreground">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-medium text-foreground">
-            Execution Trace
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <h3 className="font-medium text-foreground">Execution Trace</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Inspecting routes, guards, payments, and response payloads.
           </p>
         </div>
@@ -255,27 +253,31 @@ function AgentExecutionTrace({ steps }: { steps: TraceStep[] }) {
   )
 }
 
-function TraceStepView({ step }: { step: TraceStep }) {
-  const isPending = step.status === "pending"
+function TraceStepView({
+  step,
+  isLast,
+}: {
+  step: TraceStep
+  isLast?: boolean
+}) {
   const isActive = step.status === "active"
   const isFailed = step.status === "failed"
-  const previousActivity = step.activityLog.slice(0, -1)
+  const activityLog = isActive ? [] : step.activityLog
 
   return (
-    <ChainOfThoughtStep open={!isPending}>
+    <ChainOfThoughtStep open isLast={isLast}>
       <ChainOfThoughtTrigger
         leftIcon={
           isFailed ? (
-            <WarningCircle size={14} weight="fill" />
+            <WarningCircleIcon size={14} weight="fill" />
           ) : step.status === "completed" ? (
-            <CheckCircle size={14} weight="fill" />
+            <CheckCircleIcon size={14} weight="fill" />
           ) : (
-            <Circle size={10} weight={isActive ? "fill" : "regular"} />
+            <CircleIcon size={10} weight={isActive ? "fill" : "regular"} />
           )
         }
         swapIconOnHover={false}
         className={cn("w-full justify-between", {
-          "text-zinc-500": isPending,
           "text-zinc-100": isActive,
           "text-zinc-300": step.status === "completed",
           "text-risk": isFailed,
@@ -283,29 +285,23 @@ function TraceStepView({ step }: { step: TraceStep }) {
       >
         <span className="flex w-full min-w-0 flex-col">
           <span>{step.title}</span>
-          {step.subtitle ? (
-            isActive ? (
-              <Loader
-                variant="text-shimmer"
-                size="sm"
-                text={step.subtitle}
-                className="mt-1"
-              />
-            ) : (
-              <span className="mt-1 text-xs text-muted-foreground">
-                {step.subtitle}
-              </span>
-            )
+          {isActive && step.subtitle ? (
+            <Loader
+              variant="text-shimmer"
+              size="sm"
+              text={step.subtitle}
+              className="mt-1"
+            />
           ) : null}
         </span>
       </ChainOfThoughtTrigger>
       <ChainOfThoughtContent>
-        {step.subSteps?.length ? (
+        {activityLog.length > 0 || step.subSteps?.length ? (
           <div className="space-y-3">
-            {previousActivity.length > 0 ? (
-              <ActivityLogItems items={previousActivity} />
+            {activityLog.length > 0 ? (
+              <ActivityLogDisclosure items={activityLog} />
             ) : null}
-            {step.subSteps.map((subStep) => (
+            {step.subSteps?.map((subStep) => (
               <Tool
                 key={subStep.id}
                 toolPart={toToolPart(subStep)}
@@ -313,8 +309,6 @@ function TraceStepView({ step }: { step: TraceStep }) {
               />
             ))}
           </div>
-        ) : previousActivity.length > 0 ? (
-          <ActivityLogItems items={previousActivity} />
         ) : null}
       </ChainOfThoughtContent>
     </ChainOfThoughtStep>
@@ -325,11 +319,45 @@ function ActivityLogItems({ items }: { items: string[] }) {
   return (
     <div className="space-y-1">
       {items.map((item, index) => (
-        <ChainOfThoughtItem key={`${item}-${index}`} className="text-xs">
+        <ChainOfThoughtItem key={`${item}-${index}`} className="text-sm">
           {item}
         </ChainOfThoughtItem>
       ))}
     </div>
+  )
+}
+
+function ActivityLogDisclosure({ items }: { items: string[] }) {
+  const latestActivity = items.at(-1)
+  const previousActivity = items.slice(0, -1)
+
+  if (!latestActivity) {
+    return null
+  }
+
+  if (previousActivity.length === 0) {
+    return (
+      <ChainOfThoughtItem className="text-sm">
+        {latestActivity}
+      </ChainOfThoughtItem>
+    )
+  }
+
+  return (
+    <ChainOfThought className="w-full">
+      <ChainOfThoughtStep>
+        <ChainOfThoughtTrigger
+          hideDefaultIcon
+          inlineCaret
+          className="w-full min-w-0 text-sm"
+        >
+          {latestActivity}
+        </ChainOfThoughtTrigger>
+        <ChainOfThoughtContent className="[&>div]:block [&>div>div]:mt-1">
+          <ActivityLogItems items={previousActivity} />
+        </ChainOfThoughtContent>
+      </ChainOfThoughtStep>
+    </ChainOfThought>
   )
 }
 
@@ -344,8 +372,8 @@ function ClarificationCard({
 }) {
   return (
     <div className="w-full max-w-xl rounded-xl border border-amber-500/30 bg-zinc-900 p-4">
-      <p className="text-sm text-foreground">{request.message}</p>
-      <label className="mt-4 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
+      <p className="text-foreground">{request.message}</p>
+      <label className="mt-4 block text-sm font-medium tracking-widest text-muted-foreground uppercase">
         {request.paramName}
       </label>
       <div className="mt-2 flex gap-2">
@@ -359,7 +387,7 @@ function ClarificationCard({
             }
           }}
           placeholder="@username"
-          className="h-9 bg-background text-sm"
+          className="h-9 bg-background"
         />
         <Button
           type="button"
@@ -387,7 +415,7 @@ export function ChatWindow() {
   const runIdRef = React.useRef(0)
 
   const isAutoRoute = selectedEndpoint === "Auto"
-  const RouteIcon = isAutoRoute ? Shuffle : ArrowsSplit
+  const RouteIcon = isAutoRoute ? ShuffleIcon : ArrowsSplitIcon
   const suggestions = React.useMemo(
     () => getSuggestionsForEndpoint(selectedEndpoint),
     [selectedEndpoint]
@@ -607,10 +635,8 @@ export function ChatWindow() {
   return (
     <main className="relative flex h-full min-w-0 flex-1 flex-col bg-background">
       <div className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-divider px-6">
-        <h2 className="truncate text-sm font-medium text-foreground">
-          {sessionTitle}
-        </h2>
-        <p className="shrink-0 text-xs text-muted-foreground">
+        <h2 className="truncate font-medium text-foreground">{sessionTitle}</h2>
+        <p className="shrink-0 text-sm text-muted-foreground">
           Spent: <span className="font-mono text-payment">{totalSpent}</span> |{" "}
           <span className="font-mono text-foreground">
             {apiCalls} APIs called
@@ -626,7 +652,7 @@ export function ChatWindow() {
                 <h3 className="text-lg font-medium text-foreground">
                   What should OmniClaw route?
                 </h3>
-                <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+                <p className="mt-2 max-w-xl text-muted-foreground">
                   Pick a suggestion or enter a request. The demo will inspect
                   costs, run guards, and show paid API responses as JSON.
                 </p>
@@ -638,7 +664,7 @@ export function ChatWindow() {
                     size="sm"
                     variant="outline"
                     onClick={() => setInput(suggestion)}
-                    className="h-auto max-w-full justify-start rounded-lg border-divider bg-card px-3 py-2 text-left text-xs whitespace-normal text-muted-foreground hover:text-foreground"
+                    className="h-auto max-w-full justify-start rounded-lg border-divider bg-card px-3 py-2 text-left text-sm whitespace-normal text-muted-foreground hover:text-foreground"
                   >
                     {suggestion}
                   </PromptSuggestion>
@@ -658,7 +684,7 @@ export function ChatWindow() {
               <MessageContent
                 markdown={message.role === "assistant"}
                 className={cn(
-                  "max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+                  "max-w-[82%] rounded-2xl px-4 py-3 leading-relaxed shadow-sm",
                   message.role === "user"
                     ? "rounded-tr-md bg-primary text-primary-foreground"
                     : "rounded-tl-md bg-card text-card-foreground"
@@ -694,7 +720,7 @@ export function ChatWindow() {
             >
               <MessageContent
                 markdown
-                className="max-w-[82%] rounded-2xl rounded-tl-md bg-card px-4 py-3 text-sm leading-relaxed text-card-foreground shadow-sm"
+                className="max-w-[82%] rounded-2xl rounded-tl-md bg-card px-4 py-3 leading-relaxed text-card-foreground shadow-sm"
               >
                 {finalAssistantMessage.content}
               </MessageContent>
@@ -733,14 +759,14 @@ export function ChatWindow() {
             onValueChange={setInput}
             onSubmit={handleSubmit}
             disabled={isProcessing || Boolean(clarificationRequest)}
-            maxHeight={128}
-            className="gap-2 rounded-xl border-divider bg-card p-2 shadow-lg ring-0 focus-within:border-primary"
+            maxHeight={220}
+            className="min-h-31 gap-3 rounded-3xl border-foreground/10 bg-background p-4 shadow-lg ring-0 focus-within:border-primary"
           >
             <PromptInputTextarea
               placeholder="Ask anything. Your agent will find and pay the right APIs..."
-              className="min-h-10 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+              className="min-h-16 bg-transparent px-0 py-0 text-foreground placeholder:text-muted-foreground dark:bg-transparent"
             />
-            <div className="flex flex-col gap-2 px-1 pt-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:justify-between">
               <PromptInputActions className="min-w-0">
                 <Select
                   value={selectedEndpoint}
@@ -749,13 +775,15 @@ export function ChatWindow() {
                   }}
                   disabled={isProcessing}
                 >
-                  <SelectTrigger
-                    size="sm"
-                    className="max-w-[190px] border-0 bg-transparent font-mono text-muted-foreground hover:text-foreground"
-                  >
-                    <RouteIcon size={14} className="text-route" />
-                    <SelectValue />
-                  </SelectTrigger>
+                  <PromptInputAction tooltip="Select skill">
+                    <SelectTrigger
+                      size="sm"
+                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
+                    >
+                      <RouteIcon size={14} className="text-route" />
+                      <SelectValue />
+                    </SelectTrigger>
+                  </PromptInputAction>
                   <SelectContent
                     side="top"
                     align="start"
@@ -778,13 +806,15 @@ export function ChatWindow() {
                   }}
                   disabled={isProcessing}
                 >
-                  <SelectTrigger
-                    size="sm"
-                    className="max-w-[190px] border-0 bg-transparent font-mono text-muted-foreground hover:text-foreground"
-                  >
-                    <Brain size={14} className="text-route" />
-                    <SelectValue />
-                  </SelectTrigger>
+                  <PromptInputAction tooltip="Select model">
+                    <SelectTrigger
+                      size="sm"
+                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
+                    >
+                      <BrainIcon size={14} className="text-route" />
+                      <SelectValue />
+                    </SelectTrigger>
+                  </PromptInputAction>
                   <SelectContent
                     side="top"
                     align="end"
@@ -792,7 +822,7 @@ export function ChatWindow() {
                   >
                     {modelGroups.map((group) => (
                       <SelectGroup key={group.provider}>
-                        <SelectLabel className="text-[10px] tracking-widest text-muted-foreground uppercase">
+                        <SelectLabel className="text-sm tracking-widest text-muted-foreground uppercase">
                           {group.provider}
                         </SelectLabel>
                         {group.models.map((model) => (
@@ -816,14 +846,14 @@ export function ChatWindow() {
                     onClick={handleSubmit}
                     className="bg-primary text-primary-foreground"
                   >
-                    <PaperPlaneRight size={16} weight="bold" />
+                    <PaperPlaneRightIcon size={16} weight="bold" />
                     <span className="sr-only">Send</span>
                   </Button>
                 </PromptInputAction>
               </PromptInputActions>
             </div>
           </PromptInput>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+          <p className="mt-3 text-center text-sm text-muted-foreground">
             Payments via x402 nanopayments - USDC on Arc Testnet
           </p>
         </div>

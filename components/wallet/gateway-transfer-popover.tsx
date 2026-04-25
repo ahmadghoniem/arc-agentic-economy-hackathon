@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsDownUp } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,7 +27,7 @@ export function GatewayTransferPopover() {
           />
         }
       >
-        <ArrowsDownUp size={16} weight="bold" />
+        <ArrowsDownUpIcon size={16} weight="bold" />
         <span className="sr-only">Open gateway transfer</span>
       </PopoverTrigger>
       <PopoverContent

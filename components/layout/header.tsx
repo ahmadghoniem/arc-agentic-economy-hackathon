@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsClockwise, SidebarSimple } from "@phosphor-icons/react"
+import { ArrowsClockwiseIcon, SidebarSimpleIcon } from "@phosphor-icons/react"
 
 import { GatewayTransferPopover } from "@/components/wallet/gateway-transfer-popover"
 import { walletBalances } from "@/components/wallet/wallet-data"
@@ -24,9 +24,9 @@ export function Header() {
   }
 
   return (
-    <header className="relative z-20 flex h-[52px] flex-none items-center justify-between border-b border-divider bg-background px-4">
-      <div className="flex w-[240px] items-center gap-3">
-        <h1 className="text-sm font-semibold tracking-wide text-foreground">
+    <header className="relative z-20 flex h-13 flex-none items-center justify-between border-b border-divider bg-background px-4">
+      <div className="flex w-60 items-center gap-3">
+        <h1 className="font-semibold tracking-wide text-foreground">
           OmniClaw Console
         </h1>
         <span className="relative flex size-2">
@@ -52,7 +52,7 @@ export function Header() {
               />
             }
           >
-            <ArrowsClockwise
+            <ArrowsClockwiseIcon
               size={16}
               weight="bold"
               className={cn(isRefreshing && "animate-spin")}
@@ -64,7 +64,7 @@ export function Header() {
         <GatewayTransferPopover />
       </div>
 
-      <div className="flex w-[240px] items-center justify-end gap-2">
+      <div className="flex w-60 items-center justify-end gap-2">
         <SheetTrigger
           render={
             <Button
@@ -75,7 +75,7 @@ export function Header() {
             />
           }
         >
-          <SidebarSimple size={16} />
+          <SidebarSimpleIcon size={16} />
           Browse APIs
         </SheetTrigger>
       </div>

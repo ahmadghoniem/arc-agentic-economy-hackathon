@@ -1,42 +1,32 @@
 "use client"
 
-import { apiPayments } from "@/components/activity/activity-data"
-import { StatusDot } from "@/components/shared/shared"
+import { Payments } from "@/components/activity/payments"
+import { Deposits } from "@/components/activity/deposits"
+import { Withdrawals } from "@/components/activity/withdrawals"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function Transactions() {
   return (
     <section>
-      <h2 className="mb-4 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-        Transactions
-      </h2>
-      <div className="flex flex-col gap-3">
-        {apiPayments.map((tx) => (
-          <div key={`${tx.service}-${tx.time}`} className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <div className="flex min-w-0 items-center gap-1.5">
-                <StatusDot
-                  className={
-                    tx.status === "completed" ? "bg-success" : "bg-pending"
-                  }
-                  pulse={tx.status !== "completed"}
-                />
-                <span className="truncate text-sm text-foreground">
-                  {tx.service}
-                </span>
-              </div>
-              <span className="ml-2 flex-none font-mono text-xs text-payment">
-                ${tx.amount}
-              </span>
-            </div>
-            <div className="flex items-center justify-between pl-[14px]">
-              <span className="font-mono text-xs text-muted-foreground">
-                {tx.hash ?? "-"}
-              </span>
-              <span className="text-xs text-muted-foreground">{tx.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Tabs defaultValue="payments" className="gap-3">
+        <TabsList variant="line" className="w-full justify-between">
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="deposits">Deposits</TabsTrigger>
+          <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="payments" className="mt-4">
+          <Payments />
+        </TabsContent>
+
+        <TabsContent value="deposits" className="mt-4">
+          <Deposits />
+        </TabsContent>
+
+        <TabsContent value="withdrawals" className="mt-4">
+          <Withdrawals />
+        </TabsContent>
+      </Tabs>
     </section>
   )
 }

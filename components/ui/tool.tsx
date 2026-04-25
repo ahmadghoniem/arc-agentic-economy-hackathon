@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import {
-  CaretDown,
-  CheckCircle,
-  Gear,
-  SpinnerGap,
-  XCircle,
+  CaretDownIcon,
+  CheckCircleIcon,
+  GearIcon,
+  SpinnerGapIcon,
+  XCircleIcon,
 } from "@phosphor-icons/react"
 import { useState } from "react"
 
@@ -45,20 +45,20 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
   const getStateIcon = () => {
     switch (state) {
       case "input-streaming":
-        return <SpinnerGap className="h-3.5 w-3.5 animate-spin text-route" />
+        return <SpinnerGapIcon className="h-3.5 w-3.5 animate-spin text-route" />
       case "input-available":
-        return <Gear className="h-3.5 w-3.5 text-pending" />
+        return <GearIcon className="h-3.5 w-3.5 text-pending" />
       case "output-available":
-        return <CheckCircle className="h-3.5 w-3.5 text-success" />
+        return <CheckCircleIcon className="h-3.5 w-3.5 text-success" />
       case "output-error":
-        return <XCircle className="h-3.5 w-3.5 text-risk" />
+        return <XCircleIcon className="h-3.5 w-3.5 text-risk" />
       default:
-        return <Gear className="h-3.5 w-3.5 text-muted-foreground" />
+        return <GearIcon className="h-3.5 w-3.5 text-muted-foreground" />
     }
   }
 
   const getStateBadge = () => {
-    const baseClasses = "rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+    const baseClasses = "rounded-full px-1.5 py-0.5 text-xs font-medium"
     switch (state) {
       case "input-streaming":
         return (
@@ -124,7 +124,7 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
             </span>
             {getStateBadge()}
           </div>
-          <CaretDown
+          <CaretDownIcon
             className={cn("h-3.5 w-3.5 shrink-0", isOpen && "rotate-180")}
           />
         </CollapsibleTrigger>
@@ -137,7 +137,7 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
           <div className="space-y-2 bg-background p-2.5">
             {input && Object.keys(input).length > 0 && (
               <div>
-                <h4 className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+                <h4 className="mb-1.5 text-xs font-medium tracking-widest text-muted-foreground uppercase">
                   Request body
                 </h4>
                 <CodeBlock>
@@ -145,7 +145,7 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
                     code={formatValue(input)}
                     language="json"
                     theme="github-dark"
-                    className="text-[11px] [&>pre]:px-2.5 [&>pre]:py-2"
+                    className="text-xs [&>pre]:px-2.5 [&>pre]:py-2"
                   />
                 </CodeBlock>
               </div>
@@ -153,7 +153,7 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
 
             {output && (
               <div>
-                <h4 className="mb-1.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+                <h4 className="mb-1.5 text-xs font-medium tracking-widest text-muted-foreground uppercase">
                   Response
                 </h4>
                 <CodeBlock>
@@ -161,7 +161,7 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
                     code={formatValue(output)}
                     language="json"
                     theme="github-dark"
-                    className="text-[11px] [&>pre]:px-2.5 [&>pre]:py-2"
+                    className="text-xs [&>pre]:px-2.5 [&>pre]:py-2"
                   />
                 </CodeBlock>
               </div>

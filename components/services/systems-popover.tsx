@@ -31,8 +31,8 @@ export function SystemsPopover() {
       >
         {["OmniClaw", "AI Provider"].map((label) => (
           <div key={label} className="flex items-center justify-between">
-            <span className="text-sm text-foreground">{label}</span>
-            <span className="flex items-center gap-1.5 font-mono text-xs text-success">
+            <span className="text-foreground">{label}</span>
+            <span className="flex items-center gap-1.5 font-mono text-sm text-success">
               <StatusDot className="bg-success" />
               Configured
             </span>

@@ -35,14 +35,14 @@ export function StatusStepper() {
             </div>
             <div className="flex flex-col">
               <span
-                className={cn("text-sm font-medium", {
+                className={cn("font-medium", {
                   "text-foreground": step.status !== "pending",
                   "text-muted-foreground": step.status === "pending",
                 })}
               >
                 {step.name}
               </span>
-              <span className="mt-0.5 text-xs text-muted-foreground">
+              <span className="mt-0.5 text-sm text-muted-foreground">
                 {step.detail.includes("$") ? (
                   <>
                     {step.detail.split("$")[0]}

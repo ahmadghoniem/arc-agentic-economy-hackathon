@@ -2,7 +2,7 @@
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { CaretDown } from "@phosphor-icons/react"
+import { CaretDownIcon } from "@phosphor-icons/react"
 import { type VariantProps } from "class-variance-authority"
 import { useStickToBottomContext } from "use-stick-to-bottom"
 
@@ -34,7 +34,7 @@ function ScrollButton({
       onClick={() => scrollToBottom()}
       {...props}
     >
-      <CaretDown className="h-5 w-5" />
+      <CaretDownIcon className="h-5 w-5" />
     </Button>
   )
 }
