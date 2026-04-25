@@ -11,13 +11,21 @@ export function WalletBalanceBadge({
   amount,
   copyValue,
   action,
+  icon,
 }: WalletBalance & {
   action?: ReactNode
+  icon?: ReactNode
 }) {
   return (
-    <div className="flex h-8 items-center gap-2 rounded-full border border-divider bg-card px-3">
+    <div className="flex h-8 items-center gap-2 rounded-lg border border-divider bg-card px-2">
       {/* Wallet icon */}
-      <WalletIcon size={14} weight="duotone" className="flex-none text-muted-foreground/70" />
+      {icon ?? (
+        <WalletIcon
+          size={17}
+          weight="duotone"
+          className="flex-none text-muted-foreground/70"
+        />
+      )}
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       {/* Amount */}
       <span className="ml-1 font-mono text-sm text-payment">{amount} USDC</span>

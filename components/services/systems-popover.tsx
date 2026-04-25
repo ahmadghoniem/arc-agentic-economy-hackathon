@@ -16,13 +16,15 @@ export function SystemsPopover() {
           <Button
             type="button"
             variant="ghost"
-            size="sm"
-            className="gap-1.5 text-muted-foreground hover:bg-card hover:text-foreground"
+            size="lg"
+            className="rounded-lg border border-divider bg-card px-3 text-muted-foreground hover:bg-card hover:text-foreground"
           />
         }
       >
-        <StatusDot className="bg-success" />
-        Systems OK
+        <div className="flex items-center justify-center gap-2">
+          <StatusDot className="bg-success" />
+          Systems OK
+        </div>
       </PopoverTrigger>
       <PopoverContent
         side="bottom"

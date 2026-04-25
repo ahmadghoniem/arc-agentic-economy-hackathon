@@ -54,7 +54,7 @@ export function ChatComposer({
         >
           <PromptInputTextarea
             placeholder="Ask anything. Your agent will find and pay the right APIs..."
-            className="min-h-16 bg-transparent px-0 py-0 text-foreground placeholder:text-muted-foreground dark:bg-transparent"
+            className="min-h-16 bg-transparent px-0 py-0 text-foreground placeholder:text-muted-foreground"
           />
           <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:justify-between">
             <PromptInputActions className="min-w-0">
@@ -67,8 +67,8 @@ export function ChatComposer({
               >
                 <PromptInputAction tooltip="Select skill">
                   <SelectTrigger
-                    size="sm"
-                    className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted"
+                    size="pill"
+                    className="max-w-47.5 border-transparent bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted"
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -97,8 +97,8 @@ export function ChatComposer({
               >
                 <PromptInputAction tooltip="Select model">
                   <SelectTrigger
-                    size="sm"
-                    className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted"
+                    size="pill"
+                    className="max-w-47.5 border-transparent bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted"
                   >
                     <SelectValue />
                   </SelectTrigger>

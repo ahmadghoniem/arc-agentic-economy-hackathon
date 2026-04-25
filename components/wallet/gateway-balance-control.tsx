@@ -1,7 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsDownUpIcon, VaultIcon } from "@phosphor-icons/react"
+import {
+  ArrowsDownUpIcon,
+  PaperPlaneRightIcon,
+  VaultIcon,
+} from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,11 +31,11 @@ export function GatewayBalanceControl({
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
-    <div className="flex h-8 items-center overflow-hidden rounded-full border border-divider bg-card">
+    <div className="flex h-8 items-center overflow-hidden rounded-lg border border-divider bg-card">
       {/* Label + amount */}
-      <div className="flex h-full items-center gap-2 px-3">
+      <div className="flex h-full items-center gap-2 px-2">
         <VaultIcon
-          size={14}
+          size={17}
           weight="duotone"
           className="flex-none text-muted-foreground/70"
         />
@@ -96,10 +100,11 @@ export function GatewayBalanceControl({
             />
             <Button
               type="button"
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              size="icon"
+              className="size-8 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Submit
+              <PaperPlaneRightIcon size={16} weight="bold" />
+              <span className="sr-only">Submit transfer</span>
             </Button>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">

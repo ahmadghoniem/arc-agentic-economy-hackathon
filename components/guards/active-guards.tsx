@@ -27,7 +27,7 @@ export function ActiveGuards() {
     <section className="p-3">
       {/* Section label */}
       <div className="mb-2 flex items-center gap-2">
-        <LockSimpleIcon size={13} weight="fill" className="text-success" />
+        <LockSimpleIcon size={15} weight="fill" className="text-success" />
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Active Guards
         </span>
@@ -54,7 +54,7 @@ export function ActiveGuards() {
                 {/* Icon + label */}
                 <div className="flex min-w-0 items-center gap-2">
                   <GuardIcon
-                    size={15}
+                    size={18}
                     weight="duotone"
                     className="flex-none text-muted-foreground/70"
                   />

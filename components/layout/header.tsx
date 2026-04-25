@@ -1,7 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsClockwiseIcon } from "@phosphor-icons/react"
+import {
+  ArrowsClockwiseIcon,
+  CurrencyCircleDollarIcon,
+} from "@phosphor-icons/react"
 
 import { SystemsPopover } from "@/components/services/systems-popover"
 import { walletBalances } from "@/components/wallet/wallet-data"
@@ -18,6 +21,9 @@ import { cn } from "@/lib/utils"
 export function Header() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
   const eoaBalance = walletBalances.find((wallet) => wallet.label === "EOA")
+  const circleBalance = walletBalances.find(
+    (wallet) => wallet.label === "Circle"
+  )
   const gatewayBalance = walletBalances.find(
     (wallet) => wallet.label === "Gateway"
   )
@@ -43,6 +49,18 @@ export function Header() {
       <div className="flex flex-1 items-center justify-center gap-3">
         <div className="hidden items-center gap-2 lg:flex">
           {eoaBalance ? <WalletBalanceBadge {...eoaBalance} /> : null}
+          {circleBalance ? (
+            <WalletBalanceBadge
+              {...circleBalance}
+              icon={
+                <CurrencyCircleDollarIcon
+                  size={17}
+                  weight="duotone"
+                  className="flex-none text-muted-foreground/70"
+                />
+              }
+            />
+          ) : null}
           {gatewayBalance ? (
             <GatewayBalanceControl
               label={gatewayBalance.label}
@@ -75,7 +93,7 @@ export function Header() {
       </div>
 
       {/* Status — right */}
-      <div className="flex w-[260px] flex-none items-center justify-end">
+      <div className="flex w-65 flex-none items-center justify-end">
         <SystemsPopover />
       </div>
     </header>

@@ -1,5 +1,4 @@
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 export default function RootLayout({
@@ -8,15 +7,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className="antialiased font-sans"
-    >
+    <html lang="en" suppressHydrationWarning className="font-sans antialiased">
       <body>
-        <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </ThemeProvider>
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   )
