@@ -25,11 +25,11 @@ export function Payments() {
   }
 
   return (
-    <div className="space-y-px">
+    <div className="space-y-0.5">
       {payments.map((tx) => (
         <div
           key={tx.id}
-          className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+          className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-card"
         >
           {/* Service path + time */}
           <div className="min-w-0 flex-1">

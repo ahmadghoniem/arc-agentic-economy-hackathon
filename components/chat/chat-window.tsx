@@ -3,23 +3,37 @@
 import * as React from "react"
 
 import { ChatComposer } from "@/components/chat/chat-composer"
-import { getSuggestionsForEndpoint, modelGroups as fallbackModelGroups } from "@/components/chat/chat-data"
+import {
+  getSuggestionsForEndpoint,
+  modelGroups as fallbackModelGroups,
+} from "@/components/chat/chat-data"
 import { ChatThread } from "@/components/chat/chat-thread"
 import { SessionTopbar } from "@/components/chat/session-topbar"
 import type { ModelGroup } from "@/components/chat/types"
 import { useDemoRunner } from "@/components/chat/use-demo-runner"
 
 export function ChatWindow() {
-  const [selectedModel, setSelectedModel] = React.useState("gemini-2.0-flash")
+  const [selectedModel, setSelectedModel] = React.useState(
+    "Qwen/Qwen3-8B"
+  )
   const [selectedEndpoint, setSelectedEndpoint] = React.useState("Auto")
   const [input, setInput] = React.useState("")
   const [modelGroups, setModelGroups] =
     React.useState<ModelGroup[]>(fallbackModelGroups)
 
+  const availableModels = React.useMemo(
+    () => modelGroups.flatMap((group) => group.models),
+    [modelGroups]
+  )
+  const effectiveSelectedModel = availableModels.includes(selectedModel)
+    ? selectedModel
+    : (availableModels[0] ?? selectedModel)
+
   const {
     isProcessing,
     showInitialLoader,
     clarificationRequest,
+    planRequest,
     steps,
     hasTrace,
     totalSpent,
@@ -30,20 +44,17 @@ export function ChatWindow() {
     submitMessage,
     submitClarification,
     updateClarificationValue,
-  } = useDemoRunner(selectedEndpoint)
+    confirmPlan,
+    cancelPlan,
+    clearChat,
+  } = useDemoRunner(selectedEndpoint, effectiveSelectedModel)
 
   const suggestions = React.useMemo(
     () => getSuggestionsForEndpoint(selectedEndpoint),
     [selectedEndpoint]
   )
-  const isComposerDisabled = isProcessing || Boolean(clarificationRequest)
-  const availableModels = React.useMemo(
-    () => modelGroups.flatMap((group) => group.models),
-    [modelGroups]
-  )
-  const effectiveSelectedModel = availableModels.includes(selectedModel)
-    ? selectedModel
-    : (availableModels[0] ?? selectedModel)
+  const isComposerDisabled =
+    isProcessing || Boolean(clarificationRequest) || Boolean(planRequest)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -54,15 +65,13 @@ export function ChatWindow() {
           cache: "no-store",
           signal: controller.signal,
         })
-        const payload = (await res.json().catch(() => null)) as
-          | {
-              ok?: boolean
-              groups?: Array<{
-                provider: string
-                models: Array<{ id: string; enabled: boolean }>
-              }>
-            }
-          | null
+        const payload = (await res.json().catch(() => null)) as {
+          ok?: boolean
+          groups?: Array<{
+            provider: string
+            models: Array<{ id: string; enabled: boolean }>
+          }>
+        } | null
         if (!res.ok || !payload?.ok || !Array.isArray(payload.groups)) return
 
         const groups: ModelGroup[] = payload.groups
@@ -107,6 +116,7 @@ export function ChatWindow() {
         sessionTitle={sessionTitle}
         totalSpent={totalSpent}
         apiCalls={apiCalls}
+        onClear={clearChat}
       />
 
       <ChatThread
@@ -118,9 +128,12 @@ export function ChatWindow() {
         hasTrace={hasTrace}
         steps={steps}
         clarificationRequest={clarificationRequest}
+        planRequest={planRequest}
         onSuggestionSelect={handleSuggestionSelect}
         onClarificationChange={updateClarificationValue}
         onClarificationSubmit={submitClarification}
+        onPlanConfirm={confirmPlan}
+        onPlanCancel={cancelPlan}
       />
 
       <ChatComposer

@@ -127,7 +127,7 @@ const API_TEMPLATES: ApiTemplate[] = [
     id: "twitter-user-info",
     name: "Twitter User Info",
     method: "GET",
-    url: "https://api.aisa.one/apis/v2/twitter/user/info?userName=jack",
+    url: "https://api.aisa.one/apis/v2/twitter/user/info",
   },
   {
     id: "multi-search",
@@ -166,11 +166,13 @@ function toStringOrNull(value: unknown) {
   return text ? text : null
 }
 
-function formatAtomicUsdc(value: number, digits = 2) {
+// Always 6 decimal places so nanopayments are visible (e.g. 0.000440 USDC)
+function formatAtomicUsdc(value: number, digits = 6) {
   return `${(value / 1_000_000).toFixed(digits)} USDC`
 }
 
-function formatAtomicAmount(value: number, digits = 2) {
+// Returns just the number string, no unit — callers append " USDC" themselves
+function formatAtomicAmount(value: number, digits = 6) {
   return (value / 1_000_000).toFixed(digits)
 }
 
@@ -179,13 +181,15 @@ function formatPaymentAmount(value: unknown, fallbackAtomic = 0) {
   if (Number.isFinite(decimal) && decimal > 0) {
     return {
       amountAtomic: Math.round(decimal * 1_000_000),
-      amountDisplay: `${decimal.toFixed(5)} USDC`,
+      amountDisplay: `${decimal.toFixed(6)} USDC`,
     }
   }
 
   return {
     amountAtomic: fallbackAtomic,
-    amountDisplay: fallbackAtomic ? formatAtomicUsdc(fallbackAtomic, 5) : "0 USDC",
+    amountDisplay: fallbackAtomic
+      ? formatAtomicUsdc(fallbackAtomic)
+      : "0.000000 USDC",
   }
 }
 
@@ -209,7 +213,11 @@ function shortenEndpoint(value: string) {
 
 function normalizeStatus(value: unknown): ActivityStatus {
   const status = String(value || "").toLowerCase()
-  if (["completed", "complete", "confirmed", "success", "succeeded"].includes(status)) {
+  if (
+    ["completed", "complete", "confirmed", "success", "succeeded"].includes(
+      status
+    )
+  ) {
     return "completed"
   }
   if (["failed", "error"].includes(status)) return "failed"
@@ -255,16 +263,21 @@ function extractExplorerSnapshot(payload: unknown): ExplorerSnapshot {
     ? explorer.gatewayDeposits
     : []
 
+  const eoaUsdcBalanceAtomic = toNumber(explorer.eoaUsdcBalanceAtomic)
+
   return {
-    eoaUsdcBalanceAtomic: toNumber(explorer.eoaUsdcBalanceAtomic),
-    eoaUsdcBalanceDisplay:
-      toStringOrNull(explorer.eoaUsdcBalanceDisplay) || "0.00 USDC",
+    eoaUsdcBalanceAtomic,
+    // Always derive the display value from atomic so decimal depth is consistent.
+    // Never trust the pre-formatted string from the API — it caps at 2 decimals.
+    eoaUsdcBalanceDisplay: formatAtomicUsdc(eoaUsdcBalanceAtomic),
     gatewayDeposits: gatewayDeposits.map((entry, index) => {
       const deposit = entry as Record<string, unknown>
       const amountAtomic = toNumber(deposit.amountAtomic)
       return {
         transactionHash: String(
-          deposit.transactionHash || deposit.transaction_hash || `deposit_${index}`
+          deposit.transactionHash ||
+            deposit.transaction_hash ||
+            `deposit_${index}`
         ),
         blockNumber:
           deposit.blockNumber !== undefined && deposit.blockNumber !== null
@@ -272,8 +285,7 @@ function extractExplorerSnapshot(payload: unknown): ExplorerSnapshot {
             : null,
         timestamp: String(deposit.timestamp || new Date().toISOString()),
         amountAtomic,
-        amountDisplay:
-          toStringOrNull(deposit.amountDisplay) || formatAtomicUsdc(amountAtomic),
+        amountDisplay: formatAtomicUsdc(amountAtomic),
         fromAddress: String(deposit.fromAddress || deposit.from_address || ""),
         toAddress: String(deposit.toAddress || deposit.to_address || ""),
         explorerUrl: String(deposit.explorerUrl || deposit.explorer_url || ""),
@@ -322,7 +334,7 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
     gatewayOnchainBalanceAtomic: 0,
     circleWalletBalance: null,
     eoaUsdcBalanceAtomic: 0,
-    eoaUsdcBalanceDisplay: "0.00 USDC",
+    eoaUsdcBalanceDisplay: "0.000000 USDC",
     policy: {
       dailyMax: null,
       perMinute: null,
@@ -415,7 +427,10 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
               ""
           ),
           walletId: String(
-            balanceRecord.wallet_id || addressRecord.wallet_id || state.account.walletId || ""
+            balanceRecord.wallet_id ||
+              addressRecord.wallet_id ||
+              state.account.walletId ||
+              ""
           ),
           gatewayBalanceAtomic: toNumber(
             balanceRecord.gateway_balance_atomic,
@@ -429,9 +444,11 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
             ? String(balanceRecord.circle_wallet_balance)
             : state.account.circleWalletBalance,
           eoaUsdcBalanceAtomic:
-            explorerSnapshot?.eoaUsdcBalanceAtomic ?? existingSnapshot.eoaUsdcBalanceAtomic,
+            explorerSnapshot?.eoaUsdcBalanceAtomic ??
+            existingSnapshot.eoaUsdcBalanceAtomic,
           eoaUsdcBalanceDisplay:
-            explorerSnapshot?.eoaUsdcBalanceDisplay ?? existingSnapshot.eoaUsdcBalanceDisplay,
+            explorerSnapshot?.eoaUsdcBalanceDisplay ??
+            existingSnapshot.eoaUsdcBalanceDisplay,
           policy:
             wallets.status === "fulfilled"
               ? extractWalletPolicy(wallets.value)
@@ -441,7 +458,9 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
         },
         activity: {
           ...state.activity,
-          explorerDeposits: explorerSnapshot?.gatewayDeposits ?? state.activity.explorerDeposits,
+          explorerDeposits:
+            explorerSnapshot?.gatewayDeposits ??
+            state.activity.explorerDeposits,
         },
       }))
     } catch (error) {
@@ -477,7 +496,9 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
       set((state) => ({
         account: {
           ...state.account,
-          walletId: String(balanceRecord.wallet_id || state.account.walletId || ""),
+          walletId: String(
+            balanceRecord.wallet_id || state.account.walletId || ""
+          ),
           eoaAddress: String(
             balanceRecord.eoa_address ||
               balanceRecord.payment_address ||
@@ -501,15 +522,19 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
             ? String(balanceRecord.circle_wallet_balance)
             : state.account.circleWalletBalance,
           eoaUsdcBalanceAtomic:
-            explorerSnapshot?.eoaUsdcBalanceAtomic ?? existingSnapshot.eoaUsdcBalanceAtomic,
+            explorerSnapshot?.eoaUsdcBalanceAtomic ??
+            existingSnapshot.eoaUsdcBalanceAtomic,
           eoaUsdcBalanceDisplay:
-            explorerSnapshot?.eoaUsdcBalanceDisplay ?? existingSnapshot.eoaUsdcBalanceDisplay,
+            explorerSnapshot?.eoaUsdcBalanceDisplay ??
+            existingSnapshot.eoaUsdcBalanceDisplay,
           status: "success",
           error: null,
         },
         activity: {
           ...state.activity,
-          explorerDeposits: explorerSnapshot?.gatewayDeposits ?? state.activity.explorerDeposits,
+          explorerDeposits:
+            explorerSnapshot?.gatewayDeposits ??
+            state.activity.explorerDeposits,
         },
       }))
     } catch (error) {
@@ -524,7 +549,7 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
       activity: { ...state.activity, status: "loading", error: null },
     }))
     try {
-      const payload = await fetchJson("/api/omniclaw/transactions?limit=20")
+      const payload = await fetchJson("/api/omniclaw/transactions?limit=50")
       set((state) => ({
         activity: {
           ...state.activity,
@@ -548,7 +573,9 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
     })) as Record<string, unknown>
     const rawAmount = Math.round(Number(amount) * 1_000_000)
     const id = String(
-      result.deposit_tx_hash || result.approval_tx_hash || `deposit_${Date.now()}`
+      result.deposit_tx_hash ||
+        result.approval_tx_hash ||
+        `deposit_${Date.now()}`
     )
     set((state) => ({
       activity: {
@@ -645,7 +672,9 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
 
     const apiResponse = parseApiResponse(payResult.response_data)
     const amount = formatPaymentAmount(payResult.amount)
-    const transactionId = String(payResult.transaction_id || `pay_${Date.now()}`)
+    const transactionId = String(
+      payResult.transaction_id || `pay_${Date.now()}`
+    )
 
     set((state) => ({
       execution: {

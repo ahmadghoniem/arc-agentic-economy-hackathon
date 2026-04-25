@@ -18,8 +18,29 @@ export async function POST(req: Request) {
       ? body.idempotencyKey
       : `arc_${template.id}_${Date.now()}`
 
+  const stepInput =
+    body?.stepInput && typeof body.stepInput === "object"
+      ? (body.stepInput as Record<string, unknown>)
+      : {}
+
+  const resolvedUrl = template.buildUrl
+    ? template.buildUrl(stepInput)
+    : template.url
+
+  const resolvedBody = template.buildBody
+    ? template.buildBody(stepInput)
+    : template.body
+
+  const resolvedTemplate = {
+    ...template,
+    url: resolvedUrl,
+    body: resolvedBody,
+  }
+
   try {
-    return NextResponse.json(toProxySuccess(await pay(template, idempotencyKey)))
+    return NextResponse.json(
+      toProxySuccess(await pay(resolvedTemplate, idempotencyKey))
+    )
   } catch (error) {
     return NextResponse.json(toProxyError(error), { status: 502 })
   }

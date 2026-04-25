@@ -18,13 +18,14 @@ function parseModelList(value: string | undefined, fallback: string[]) {
 
 export function getModelRegistry(): ModelRegistryEntry[] {
   const geminiModels = parseModelList(process.env.GEMINI_MODEL, [
+    "gemini-2.5-flash-lite",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
   ])
   const featherlessModels = parseModelList(process.env.FEATHERLESS_MODEL, [
-    "claude-haiku-4-5",
-    "qwen3.5-plus",
-    "nemotron-super-free",
+    "Qwen/Qwen3-8B",
+    "Qwen/Qwen3-14B",
+    "Qwen/Qwen3-30B-A3B",
+    "mistralai/Mistral-Nemo-Instruct-2407",
   ])
 
   const registry: ModelRegistryEntry[] = []

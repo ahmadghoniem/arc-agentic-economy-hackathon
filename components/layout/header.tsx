@@ -62,7 +62,7 @@ export function Header() {
         <div className="hidden items-center gap-2 lg:flex">
           <WalletBalanceBadge
             label="EOA"
-            amount={formatAtomicAmount(account.eoaUsdcBalanceAtomic, 3)}
+            amount={formatAtomicAmount(account.eoaUsdcBalanceAtomic)}
             copyValue={account.eoaAddress ?? undefined}
           />
           <WalletBalanceBadge

@@ -38,11 +38,11 @@ export function Deposits() {
   return <div className="space-y-4">
     {explorerDeposits.length > 0 ? (
       <div className="space-y-2">
-        <div className="space-y-px">
+        <div className="space-y-0.5">
           {explorerDeposits.map((deposit) => (
             <div
               key={deposit.transactionHash}
-              className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+              className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-card"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
@@ -98,14 +98,14 @@ export function Deposits() {
         <p className="px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
           Session deposits
         </p>
-        <div className="space-y-px">
+        <div className="space-y-0.5">
           {deposits.map((activity) => {
             const isPending = activity.status !== "completed"
 
             return (
               <div
                 key={activity.id}
-                className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+                className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-card"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">

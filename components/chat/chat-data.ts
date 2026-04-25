@@ -7,11 +7,16 @@ import type {
 export const modelGroups: ModelGroup[] = [
   {
     provider: "FEATHERLESS",
-    models: ["claude-haiku-4-5", "qwen3.5-plus", "nemotron-super-free"],
+    models: [
+      "Qwen/Qwen3-8B",
+      "Qwen/Qwen3-14B",
+      "Qwen/Qwen3-30B-A3B",
+      "mistralai/Mistral-Nemo-Instruct-2407",
+    ],
   },
   {
     provider: "GEMINI",
-    models: ["gemini-2.0-flash", "gemini-2.5-flash"],
+    models: ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
   },
 ]
 

@@ -40,7 +40,7 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
           <Button
             type="button"
             variant="ghost"
-            size="icon-lg"
+            size="icon"
             className="text-muted-foreground hover:text-foreground"
             onClick={() => copyText(value)}
           />

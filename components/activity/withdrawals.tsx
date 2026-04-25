@@ -25,14 +25,14 @@ export function Withdrawals() {
   }
 
   return (
-    <div className="space-y-px">
+    <div className="space-y-0.5">
       {withdrawals.map((activity) => {
         const isPending = activity.status !== "completed"
 
         return (
           <div
             key={activity.id}
-            className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
+            className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-card"
           >
             {/* Label + hash */}
             <div className="min-w-0 flex-1">

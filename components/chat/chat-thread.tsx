@@ -4,13 +4,21 @@ import type { ChatMessage, TraceStep } from "@/components/chat/types"
 import type { ClarificationRequest } from "@/components/chat/use-demo-runner"
 import { ClarificationCard } from "@/components/chat/clarification-card"
 import { AgentExecutionTrace } from "@/components/chat/execution-trace"
+import { PlanCard, type PlanRequest } from "@/components/chat/plan-card"
 import {
   ChatContainerContent,
   ChatContainerRoot,
   ChatContainerScrollAnchor,
 } from "@/components/ui/chat-container"
 import { Loader } from "@/components/ui/loader"
-import { Message, MessageContent } from "@/components/ui/message"
+import { Button } from "@/components/ui/button"
+import {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageContent,
+} from "@/components/ui/message"
+import { CopyIcon } from "@phosphor-icons/react"
 import { PromptSuggestion } from "@/components/ui/prompt-suggestion"
 import { ScrollButton } from "@/components/ui/scroll-button"
 import { cn } from "@/lib/utils"
@@ -24,9 +32,12 @@ type ChatThreadProps = {
   hasTrace: boolean
   steps: TraceStep[]
   clarificationRequest: ClarificationRequest | null
+  planRequest: PlanRequest | null
   onSuggestionSelect: (suggestion: string) => void
   onClarificationChange: (value: string) => void
   onClarificationSubmit: () => void
+  onPlanConfirm: () => void
+  onPlanCancel: () => void
 }
 
 function ChatBubble({ message }: { message: ChatMessage }) {
@@ -48,6 +59,20 @@ function ChatBubble({ message }: { message: ChatMessage }) {
       >
         {message.content}
       </MessageContent>
+      {message.role === "assistant" && (
+        <MessageActions>
+          <MessageAction tooltip="Copy to clipboard">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full text-muted-foreground"
+              onClick={() => navigator.clipboard.writeText(message.content)}
+            >
+              <CopyIcon className="size-4" />
+            </Button>
+          </MessageAction>
+        </MessageActions>
+      )}
     </Message>
   )
 }
@@ -61,9 +86,12 @@ export function ChatThread({
   hasTrace,
   steps,
   clarificationRequest,
+  planRequest,
   onSuggestionSelect,
   onClarificationChange,
   onClarificationSubmit,
+  onPlanConfirm,
+  onPlanCancel,
 }: ChatThreadProps) {
   return (
     <ChatContainerRoot className="min-h-0 flex-1">
@@ -116,7 +144,7 @@ export function ChatThread({
           </div>
         ) : null}
 
-        {finalAssistantMessage ? (
+        {finalAssistantMessage && finalAssistantMessage.content.trim() ? (
           <ChatBubble message={finalAssistantMessage} />
         ) : null}
 
@@ -126,6 +154,17 @@ export function ChatThread({
               request={clarificationRequest}
               onValueChange={onClarificationChange}
               onSubmit={onClarificationSubmit}
+            />
+          </div>
+        ) : null}
+
+        {planRequest ? (
+          <div className="flex justify-start">
+            <PlanCard
+              request={planRequest}
+              disabled={isProcessing}
+              onConfirm={onPlanConfirm}
+              onCancel={onPlanCancel}
             />
           </div>
         ) : null}

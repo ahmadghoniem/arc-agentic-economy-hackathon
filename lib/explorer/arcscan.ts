@@ -79,7 +79,7 @@ function toNumber(value: unknown, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-function formatAtomicUsdc(value: number, digits = 2) {
+function formatAtomicUsdc(value: number, digits = 6) {
   return `${(value / 1_000_000).toFixed(digits)} USDC`
 }
 

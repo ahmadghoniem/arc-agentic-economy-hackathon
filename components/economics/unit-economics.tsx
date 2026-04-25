@@ -5,6 +5,7 @@ import { ArrowSquareOutIcon } from "@phosphor-icons/react"
 
 const FALLBACK_GATEWAY_COST = "~$0.0001"
 const FALLBACK_BASE_GAS_COST = "~$0.0020"
+const FALLBACK_SOLANA_GAS_COST = "~$0.0004"
 const NANO_PAYMENT_VALUE = 0.00044
 
 type GasEstimate = {
@@ -14,6 +15,8 @@ type GasEstimate = {
 
 export function UnitEconomics() {
   const [gasEstimate, setGasEstimate] = React.useState<GasEstimate | null>(null)
+  const [solanaEstimate, setSolanaEstimate] =
+    React.useState<GasEstimate | null>(null)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -39,6 +42,30 @@ export function UnitEconomics() {
     return () => controller.abort()
   }, [])
 
+  React.useEffect(() => {
+    const controller = new AbortController()
+
+    async function load() {
+      try {
+        const res = await fetch("/api/economics/solana-gas", {
+          cache: "no-store",
+          signal: controller.signal,
+        })
+        const payload = (await res.json().catch(() => null)) as {
+          success?: boolean
+          data?: GasEstimate
+        } | null
+        if (!res.ok || !payload?.success || !payload.data) return
+        setSolanaEstimate(payload.data)
+      } catch {
+        // Keep the fallback values if the live estimate is unavailable.
+      }
+    }
+
+    void load()
+    return () => controller.abort()
+  }, [])
+
   const liveGasCost = gasEstimate?.displayCost || FALLBACK_BASE_GAS_COST
   const liveGasRatio = gasEstimate
     ? gasEstimate.referenceTxCostUsd / NANO_PAYMENT_VALUE
@@ -51,12 +78,32 @@ export function UnitEconomics() {
     gasEstimate && gasEstimate.referenceTxCostUsd > 0
       ? (liveGasRatio * 100).toFixed(0)
       : "0"
+
+  const liveSolanaCost = solanaEstimate?.displayCost || FALLBACK_SOLANA_GAS_COST
+  const liveSolanaRatio = solanaEstimate
+    ? solanaEstimate.referenceTxCostUsd / NANO_PAYMENT_VALUE
+    : 0
+  const liveSolanaPercent = Math.min(
+    100,
+    Math.max(1, Math.round(liveSolanaRatio * 100))
+  )
+  const liveSolanaOverhead =
+    solanaEstimate && solanaEstimate.referenceTxCostUsd > 0
+      ? (liveSolanaRatio * 100).toFixed(0)
+      : "~91"
+
   const marginRows = [
     {
       label: "Gateway cost per call",
       cost: FALLBACK_GATEWAY_COST,
       percent: 1,
       tone: "bg-success",
+    },
+    {
+      label: "Solana L1 fee per call",
+      cost: liveSolanaCost,
+      percent: liveSolanaPercent,
+      tone: "bg-pending",
     },
     {
       label: "Base L2 gas per call",
@@ -83,7 +130,18 @@ export function UnitEconomics() {
             <div className="mb-1.5 flex items-center justify-between gap-2">
               <span className="flex items-center gap-1 text-xs font-medium text-foreground/80">
                 {row.label}
-                {row.label === "Base L2 gas per call" ? (
+                {row.label === "Solana L1 fee per call" ? (
+                  <a
+                    href="https://explorer.solana.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="Open Solana Explorer"
+                    title="Open Solana Explorer"
+                  >
+                    <ArrowSquareOutIcon size={12} weight="bold" />
+                  </a>
+                ) : row.label === "Base L2 gas per call" ? (
                   <a
                     href="https://basescan.org/gastracker"
                     target="_blank"
@@ -100,7 +158,9 @@ export function UnitEconomics() {
                 {row.cost} (
                 {row.label === "Base L2 gas per call"
                   ? liveGasOverhead
-                  : row.percent}
+                  : row.label === "Solana L1 fee per call"
+                    ? liveSolanaOverhead
+                    : row.percent}
                 %)
               </span>
             </div>
@@ -115,8 +175,8 @@ export function UnitEconomics() {
       </div>
 
       <div className="mt-3 text-xs leading-4 text-muted-foreground/70">
-        <p>Per-call L2 (ex. Base) gas inevitably kills sub-cent pricing</p>
-        <p>Circle Gateway batches signatures off-chain, </p>
+        <p>Per-call L2 & L1 gas inevitably kills sub-cent pricing</p>
+        <p>Circle Gateway batches signatures off-chain.</p>
         <p>making micropayments economically viable.</p>
       </div>
     </section>

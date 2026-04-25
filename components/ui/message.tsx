@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { Markdown } from "./markdown"
+import { CopyIcon } from "@phosphor-icons/react"
+import { Button } from "./button"
 
 export type MessageProps = {
   children: React.ReactNode
@@ -115,4 +117,42 @@ const MessageAction = ({
   )
 }
 
-export { Message, MessageAvatar, MessageContent, MessageActions, MessageAction }
+export type MessageCopyActionProps = {
+  value: string
+  label?: string
+  side?: "top" | "bottom" | "left" | "right"
+} & React.ComponentProps<typeof Tooltip>
+
+function copyText(value: string) {
+  if (typeof navigator !== "undefined" && navigator.clipboard) {
+    void navigator.clipboard.writeText(value)
+  }
+}
+
+const MessageCopyAction = ({
+  value,
+  label = "Copy to clipboard",
+  side = "top",
+  ...props
+}: MessageCopyActionProps) => {
+  return (
+    <TooltipProvider>
+      <Tooltip {...props}>
+        <TooltipTrigger className="text-muted-foreground hover:text-foreground">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => copyText(value)}
+          >
+            <CopyIcon size={14} weight="bold" />
+            <span className="sr-only">{label}</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side={side}>{label}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+export { Message, MessageAvatar, MessageContent, MessageActions, MessageAction, MessageCopyAction }

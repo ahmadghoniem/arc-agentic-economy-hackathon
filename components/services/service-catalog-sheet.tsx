@@ -31,7 +31,7 @@ export function ServiceCatalog() {
           </div>
 
           <div className="flex-none pt-0.5 text-right">
-            <span className="font-mono text-xs text-payment">
+            <span className="font-mono text-xs font-semibold text-payment">
               {service.pricePerCall}
             </span>
             <p className="text-xs text-muted-foreground/50">/ call</p>
