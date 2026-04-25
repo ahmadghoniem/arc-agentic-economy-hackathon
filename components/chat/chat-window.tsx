@@ -2,12 +2,9 @@
 
 import * as React from "react"
 import {
-  ArrowsSplitIcon,
-  BrainIcon,
   CheckCircleIcon,
   CircleIcon,
   PaperPlaneRightIcon,
-  ShuffleIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react"
 
@@ -415,7 +412,6 @@ export function ChatWindow() {
   const runIdRef = React.useRef(0)
 
   const isAutoRoute = selectedEndpoint === "Auto"
-  const RouteIcon = isAutoRoute ? ShuffleIcon : ArrowsSplitIcon
   const suggestions = React.useMemo(
     () => getSuggestionsForEndpoint(selectedEndpoint),
     [selectedEndpoint]
@@ -778,9 +774,8 @@ export function ChatWindow() {
                   <PromptInputAction tooltip="Select skill">
                     <SelectTrigger
                       size="sm"
-                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
+                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted"
                     >
-                      <RouteIcon size={14} className="text-route" />
                       <SelectValue />
                     </SelectTrigger>
                   </PromptInputAction>
@@ -809,9 +804,8 @@ export function ChatWindow() {
                   <PromptInputAction tooltip="Select model">
                     <SelectTrigger
                       size="sm"
-                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
+                      className="max-w-47.5 border-0 bg-transparent font-mono text-muted-foreground shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted"
                     >
-                      <BrainIcon size={14} className="text-route" />
                       <SelectValue />
                     </SelectTrigger>
                   </PromptInputAction>

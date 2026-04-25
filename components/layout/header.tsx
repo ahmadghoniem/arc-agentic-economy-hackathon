@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsClockwiseIcon, SidebarSimpleIcon } from "@phosphor-icons/react"
+import { ArrowsClockwiseIcon } from "@phosphor-icons/react"
 
-import { GatewayTransferPopover } from "@/components/wallet/gateway-transfer-popover"
+import { SystemsPopover } from "@/components/services/systems-popover"
 import { walletBalances } from "@/components/wallet/wallet-data"
+import { GatewayBalanceControl } from "@/components/wallet/gateway-balance-control"
 import { WalletBalanceBadge } from "@/components/wallet/wallet-balance-badge"
 import { Button } from "@/components/ui/button"
-import { SheetTrigger } from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -17,6 +17,10 @@ import { cn } from "@/lib/utils"
 
 export function Header() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
+  const eoaBalance = walletBalances.find((wallet) => wallet.label === "EOA")
+  const gatewayBalance = walletBalances.find(
+    (wallet) => wallet.label === "Gateway"
+  )
 
   const refreshBalances = () => {
     setIsRefreshing(true)
@@ -35,10 +39,14 @@ export function Header() {
         </span>
       </div>
 
-      <div className="hidden items-center gap-2 lg:flex">
-        {walletBalances.map((wallet) => (
-          <WalletBalanceBadge key={wallet.label} {...wallet} />
-        ))}
+      <div className="hidden items-center gap-6 lg:flex">
+        {eoaBalance ? <WalletBalanceBadge {...eoaBalance} /> : null}
+        {gatewayBalance ? (
+          <GatewayBalanceControl
+            label={gatewayBalance.label}
+            amount={gatewayBalance.amount}
+          />
+        ) : null}
         <Tooltip>
           <TooltipTrigger
             render={
@@ -61,23 +69,10 @@ export function Header() {
           </TooltipTrigger>
           <TooltipContent>Refresh balances</TooltipContent>
         </Tooltip>
-        <GatewayTransferPopover />
       </div>
 
       <div className="flex w-60 items-center justify-end gap-2">
-        <SheetTrigger
-          render={
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2 border-divider bg-transparent text-muted-foreground hover:bg-card hover:text-foreground"
-            />
-          }
-        >
-          <SidebarSimpleIcon size={16} />
-          Browse APIs
-        </SheetTrigger>
+        <SystemsPopover />
       </div>
     </header>
   )

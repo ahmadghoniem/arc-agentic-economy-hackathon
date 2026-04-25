@@ -8,12 +8,6 @@ export const walletBalances: WalletBalance[] = [
     copyValue: "0xfa0d...3351",
   },
   {
-    label: "Circle",
-    amount: "20 USDC",
-    statusColor: "bg-route",
-    copyValue: "0x1234...5678",
-  },
-  {
     label: "Gateway",
     amount: "7.17 USDC",
     statusColor: "bg-success",

@@ -6,7 +6,6 @@ import {
   CaretDownIcon,
   CaretUpIcon,
   CheckIcon,
-  CaretUpDownIcon,
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
@@ -54,7 +53,7 @@ function SelectTrigger({
       {children}
       <SelectPrimitive.Icon
         render={
-          <CaretUpDownIcon
+          <CaretDownIcon
             weight="bold"
             className="pointer-events-none size-3.5 text-muted-foreground"
           />
