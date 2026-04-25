@@ -10,14 +10,6 @@ export const guardItems: GuardItem[] = [
     progress: 32,
   },
   {
-    id: "rate-limit",
-    label: "Rate Limit",
-    value: "5 tx/min",
-    helper: "Live visual of current usage",
-    icon: "gauge",
-    progress: 46,
-  },
-  {
     id: "recipients",
     label: "Recipients",
     value: "api.aisa.one",

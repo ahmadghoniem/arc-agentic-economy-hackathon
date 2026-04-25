@@ -7,7 +7,6 @@ import {
 } from "@phosphor-icons/react"
 
 import { SystemsPopover } from "@/components/services/systems-popover"
-import { walletBalances } from "@/components/wallet/wallet-data"
 import { GatewayBalanceControl } from "@/components/wallet/gateway-balance-control"
 import { WalletBalanceBadge } from "@/components/wallet/wallet-balance-badge"
 import { Button } from "@/components/ui/button"
@@ -16,21 +15,34 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  formatAtomicAmount,
+  useOmniClawStore,
+} from "@/lib/stores/omniclaw-store"
 import { cn } from "@/lib/utils"
 
 export function Header() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
-  const eoaBalance = walletBalances.find((wallet) => wallet.label === "EOA")
-  const circleBalance = walletBalances.find(
-    (wallet) => wallet.label === "Circle"
+  const account = useOmniClawStore((state) => state.account)
+  const refreshConnection = useOmniClawStore(
+    (state) => state.refreshConnection
   )
-  const gatewayBalance = walletBalances.find(
-    (wallet) => wallet.label === "Gateway"
+  const refreshAccount = useOmniClawStore((state) => state.refreshAccount)
+  const refreshTransactions = useOmniClawStore(
+    (state) => state.refreshTransactions
   )
+
+  React.useEffect(() => {
+    void refreshConnection()
+    void refreshAccount()
+    void refreshTransactions()
+  }, [refreshAccount, refreshConnection, refreshTransactions])
 
   const refreshBalances = () => {
     setIsRefreshing(true)
-    window.setTimeout(() => setIsRefreshing(false), 900)
+    Promise.all([refreshConnection(), refreshAccount(), refreshTransactions()])
+      .catch(() => undefined)
+      .finally(() => setIsRefreshing(false))
   }
 
   return (
@@ -48,25 +60,27 @@ export function Header() {
       {/* Wallet controls — center */}
       <div className="flex flex-1 items-center justify-center gap-3">
         <div className="hidden items-center gap-2 lg:flex">
-          {eoaBalance ? <WalletBalanceBadge {...eoaBalance} /> : null}
-          {circleBalance ? (
-            <WalletBalanceBadge
-              {...circleBalance}
-              icon={
-                <CurrencyCircleDollarIcon
-                  size={17}
-                  weight="duotone"
-                  className="flex-none text-muted-foreground/70"
-                />
-              }
-            />
-          ) : null}
-          {gatewayBalance ? (
-            <GatewayBalanceControl
-              label={gatewayBalance.label}
-              amount={gatewayBalance.amount}
-            />
-          ) : null}
+          <WalletBalanceBadge
+            label="EOA"
+            amount={formatAtomicAmount(account.eoaUsdcBalanceAtomic, 3)}
+            copyValue={account.eoaAddress ?? undefined}
+          />
+          <WalletBalanceBadge
+            label="Circle"
+            amount={account.circleWalletBalance || "0.00"}
+            copyValue={account.circleWalletAddress ?? undefined}
+            icon={
+              <CurrencyCircleDollarIcon
+                size={17}
+                weight="duotone"
+                className="flex-none text-muted-foreground/70"
+              />
+            }
+          />
+          <GatewayBalanceControl
+            label="Gateway"
+            amount={formatAtomicAmount(account.gatewayBalanceAtomic)}
+          />
         </div>
         <Tooltip>
           <TooltipTrigger

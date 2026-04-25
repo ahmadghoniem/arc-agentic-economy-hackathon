@@ -1,0 +1,477 @@
+{
+  "skill": "Twitter Autopilot",
+  "description": "Twitter/X intelligence and automation — profiles, tweets, trends, communities, Spaces, and OAuth-based posting and engagement.",
+  "url": "https://aisa.one/skills/twitter-autopilot",
+  "total_endpoints": 32,
+  "price_range": { "min": "$0.00044", "max": "$0.036" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/twitter/user/info",
+      "description": "Get user profile",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/batch_info_by_ids",
+      "description": "Batch get user info by user IDs",
+      "parameters": [
+        {
+          "name": "userIds",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated user IDs"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user_about",
+      "description": "Get user profile about (country, verification, username changes)",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/last_tweets",
+      "description": "Get user's recent tweets",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/mentions",
+      "description": "Get user mentions",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/followers",
+      "description": "Get user followers",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/followings",
+      "description": "Get user followings",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/verifiedFollowers",
+      "description": "Get verified followers",
+      "parameters": [
+        {
+          "name": "user_id",
+          "type": "string",
+          "required": true,
+          "description": "User ID"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/check_follow_relationship",
+      "description": "Check follow relationship between users",
+      "parameters": [
+        {
+          "name": "source_user_name",
+          "type": "string",
+          "required": true,
+          "description": "Source username"
+        },
+        {
+          "name": "target_user_name",
+          "type": "string",
+          "required": true,
+          "description": "Target username"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/user/search",
+      "description": "Search users by keyword",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweets",
+      "description": "Get tweets by IDs",
+      "parameters": [
+        {
+          "name": "tweet_ids",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated tweet IDs"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweet/replies",
+      "description": "Get tweet replies",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweet/quotes",
+      "description": "Get tweet quotations",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweet/retweeters",
+      "description": "Get tweet retweeters",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweet/thread_context",
+      "description": "Get tweet thread context",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/article",
+      "description": "Get article by tweet",
+      "parameters": [
+        {
+          "name": "tweet_id",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/tweet/advanced_search",
+      "description": "Advanced tweet search",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "queryType",
+          "type": "string",
+          "required": true,
+          "description": "Query type"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/list/members",
+      "description": "Get list members",
+      "parameters": [
+        {
+          "name": "list_id",
+          "type": "string",
+          "required": true,
+          "description": "List ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/list/followers",
+      "description": "Get list followers",
+      "parameters": [
+        {
+          "name": "list_id",
+          "type": "string",
+          "required": true,
+          "description": "List ID"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/community/info",
+      "description": "Get community info by ID",
+      "parameters": [
+        {
+          "name": "community_id",
+          "type": "string",
+          "required": true,
+          "description": "Community ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/community/members",
+      "description": "Get community members",
+      "parameters": [
+        {
+          "name": "community_id",
+          "type": "string",
+          "required": true,
+          "description": "Community ID"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/community/moderators",
+      "description": "Get community moderators",
+      "parameters": [
+        {
+          "name": "community_id",
+          "type": "string",
+          "required": true,
+          "description": "Community ID"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/community/tweets",
+      "description": "Get community tweets",
+      "parameters": [
+        {
+          "name": "community_id",
+          "type": "string",
+          "required": true,
+          "description": "Community ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/community/get_tweets_from_all_community",
+      "description": "Search tweets from all communities",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "cursor",
+          "type": "string",
+          "required": false,
+          "description": "Pagination cursor"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/trends",
+      "description": "Get trending topics by WOEID",
+      "parameters": [
+        {
+          "name": "woeid",
+          "type": "string",
+          "required": true,
+          "description": "Where On Earth ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/twitter/spaces/detail",
+      "description": "Get Space detail",
+      "parameters": [
+        {
+          "name": "space_id",
+          "type": "string",
+          "required": true,
+          "description": "Space ID"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/auth_twitter",
+      "description": "OAuth Twitter authorization",
+      "parameters": []
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/post_twitter",
+      "description": "Post a tweet",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "description": "Tweet text content"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/like_twitter",
+      "description": "Like a tweet",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/unlike_twitter",
+      "description": "Unlike a tweet",
+      "parameters": [
+        {
+          "name": "tweetId",
+          "type": "string",
+          "required": true,
+          "description": "Tweet ID"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/follow_twitter",
+      "description": "Follow a user",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/twitter/unfollow_twitter",
+      "description": "Unfollow a user",
+      "parameters": [
+        {
+          "name": "userName",
+          "type": "string",
+          "required": true,
+          "description": "Twitter username"
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    "Get the latest tweets from @elonmusk.",
+    "How many followers does @sama have?",
+    "What are the top trending topics on Twitter right now?"
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "skill": "Prediction Market Data",
+  "description": "Prediction market data from Polymarket and Kalshi — odds, prices, orderbooks, candlesticks, trade history, wallet positions, and P&L tracking.",
+  "url": "https://aisa.one/skills/prediction-market-data",
+  "total_endpoints": 16,
+  "price_range": { "min": "$0.01", "max": "$0.01" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/kalshi/market-price/{market_ticker}",
+      "description": "Current or historical pricing (yes/no sides) for a Kalshi market",
+      "parameters": [
+        {
+          "name": "market_ticker",
+          "type": "string",
+          "required": true,
+          "description": "Kalshi market ticker"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/kalshi/markets",
+      "description": "List Kalshi markets with filters (ticker, event, status, min volume) and cursor pagination",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": false,
+          "description": "Market ticker"
+        },
+        {
+          "name": "event_ticker",
+          "type": "string",
+          "required": false,
+          "description": "Event ticker"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": "Market status"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/kalshi/orderbooks",
+      "description": "Historical orderbook snapshots for a Kalshi market (bid/ask for yes/no contracts)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Market ticker"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/kalshi/trades",
+      "description": "Executed trade history for Kalshi markets, filterable by ticker and time range",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": false,
+          "description": "Market ticker"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/matching-markets/sports",
+      "description": "Find equivalent markets across platforms using Polymarket slugs or Kalshi tickers",
+      "parameters": [
+        {
+          "name": "polymarket_market_slug",
+          "type": "string",
+          "required": false,
+          "description": "Polymarket market slug"
+        },
+        {
+          "name": "kalshi_event_ticker",
+          "type": "string",
+          "required": false,
+          "description": "Kalshi event ticker"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/matching-markets/sports/{sport}",
+      "description": "Cross-platform sports markets on a given date (football, baseball, basketball, etc.)",
+      "parameters": [
+        {
+          "name": "sport",
+          "type": "string",
+          "required": true,
+          "description": "Sport abbreviation"
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "required": false,
+          "description": "Date in YYYY-MM-DD format"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/activity",
+      "description": "On-chain trading activity (MERGES, SPLITS, REDEEMS), filterable by wallet/market/time",
+      "parameters": [
+        {
+          "name": "user",
+          "type": "string",
+          "required": false,
+          "description": "Wallet address"
+        },
+        {
+          "name": "market",
+          "type": "string",
+          "required": false,
+          "description": "Market slug"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/candlesticks/{condition_id}",
+      "description": "OHLC candlestick data with volume, open interest, bid/ask spread",
+      "parameters": [
+        {
+          "name": "condition_id",
+          "type": "string",
+          "required": true,
+          "description": "Condition ID"
+        },
+        {
+          "name": "interval",
+          "type": "string",
+          "required": false,
+          "description": "Candlestick interval"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/events",
+      "description": "Grouped related markets ordered by volume, filterable by tags/status",
+      "parameters": [
+        {
+          "name": "tag",
+          "type": "string",
+          "required": false,
+          "description": "Event tag"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": "Event status"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/market-price/{token_id}",
+      "description": "Current or historical market price (probability 0-1)",
+      "parameters": [
+        {
+          "name": "token_id",
+          "type": "string",
+          "required": true,
+          "description": "Token ID"
+        },
+        {
+          "name": "at_time",
+          "type": "string",
+          "required": false,
+          "description": "Timestamp"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/markets",
+      "description": "Polymarket market list, filterable by slug, condition ID, token ID, tags, with fuzzy search",
+      "parameters": [
+        {
+          "name": "search",
+          "type": "string",
+          "required": false,
+          "description": "Search query"
+        },
+        {
+          "name": "slug",
+          "type": "string",
+          "required": false,
+          "description": "Market slug"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": "Market status"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/orderbooks",
+      "description": "Historical orderbook snapshots (bids, asks, metadata)",
+      "parameters": [
+        {
+          "name": "token_id",
+          "type": "string",
+          "required": true,
+          "description": "Token ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/orders",
+      "description": "Historical trade data, filterable by market, condition, token, time, wallet",
+      "parameters": [
+        {
+          "name": "market_slug",
+          "type": "string",
+          "required": false,
+          "description": "Market slug"
+        },
+        {
+          "name": "token_id",
+          "type": "string",
+          "required": false,
+          "description": "Token ID"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/positions/wallet/{wallet_address}",
+      "description": "Active positions (10,000+ shares) for a proxy wallet",
+      "parameters": [
+        {
+          "name": "wallet_address",
+          "type": "string",
+          "required": true,
+          "description": "Proxy wallet address"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/wallet",
+      "description": "Wallet info by EOA, proxy, or handle, with optional trading metrics",
+      "parameters": [
+        {
+          "name": "eoa",
+          "type": "string",
+          "required": false,
+          "description": "EOA address"
+        },
+        {
+          "name": "proxy",
+          "type": "string",
+          "required": false,
+          "description": "Proxy address"
+        },
+        {
+          "name": "handle",
+          "type": "string",
+          "required": false,
+          "description": "User handle"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/polymarket/wallet/pnl/{wallet_address}",
+      "description": "Realized PnL over time for a wallet (cumulative series)",
+      "parameters": [
+        {
+          "name": "wallet_address",
+          "type": "string",
+          "required": true,
+          "description": "Wallet address"
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    "What are the current odds on the next US election on Polymarket?",
+    "Find prediction markets related to Circle and stablecoins.",
+    "Summarize the highest-volume Kalshi technology markets."
+  ]
+}

@@ -13,10 +13,6 @@ export const modelGroups: ModelGroup[] = [
     provider: "GEMINI",
     models: ["gemini-2.0-flash", "gemini-2.5-flash"],
   },
-  {
-    provider: "AI/ML",
-    models: ["gpt-4o-mini", "mistral-small"],
-  },
 ]
 
 export const endpoints = [

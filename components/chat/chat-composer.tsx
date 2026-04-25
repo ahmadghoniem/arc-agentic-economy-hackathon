@@ -2,7 +2,8 @@
 
 import { PaperPlaneRightIcon } from "@phosphor-icons/react"
 
-import { endpoints, modelGroups } from "@/components/chat/chat-data"
+import { endpoints } from "@/components/chat/chat-data"
+import type { ModelGroup } from "@/components/chat/types"
 import { Button } from "@/components/ui/button"
 import {
   PromptInput,
@@ -29,6 +30,7 @@ type ChatComposerProps = {
   onEndpointChange: (value: string) => void
   selectedModel: string
   onModelChange: (value: string) => void
+  modelGroups: ModelGroup[]
 }
 
 export function ChatComposer({
@@ -40,6 +42,7 @@ export function ChatComposer({
   onEndpointChange,
   selectedModel,
   onModelChange,
+  modelGroups,
 }: ChatComposerProps) {
   return (
     <div className="absolute inset-x-0 bottom-0 border-t border-divider bg-background p-4">

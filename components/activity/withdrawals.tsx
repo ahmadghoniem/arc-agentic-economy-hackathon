@@ -1,19 +1,37 @@
 "use client"
 
-import { withdrawalActivity } from "@/components/activity/activity-data"
 import { CopyButton } from "@/components/shared/shared"
+import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 import { cn } from "@/lib/utils"
 
+function relativeTime(value: string) {
+  const diff = Date.now() - new Date(value).getTime()
+  const minutes = Math.max(1, Math.round(diff / 60000))
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
+}
+
 export function Withdrawals() {
+  const withdrawals = useOmniClawStore((state) => state.activity.withdrawals)
+
+  if (withdrawals.length === 0) {
+    return (
+      <p className="px-2 py-3 text-xs text-muted-foreground/60">
+        No withdrawals in this session.
+      </p>
+    )
+  }
+
   return (
     <div className="space-y-px">
-      {withdrawalActivity.map((activity) => {
-        const amount = (activity.rawAmount / 1000000).toFixed(2)
+      {withdrawals.map((activity) => {
         const isPending = activity.status !== "completed"
 
         return (
           <div
-            key={activity.hash}
+            key={activity.id}
             className="group flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-card"
           >
             {/* Label + hash */}
@@ -29,19 +47,22 @@ export function Withdrawals() {
               </div>
               <div className="mt-0.5 flex items-center gap-1">
                 <span className="font-mono text-xs text-muted-foreground/50">
-                  {activity.hash}
+                  {activity.transactionId}
                 </span>
-                <CopyButton value={activity.hash} label="Copy hash" />
+                <CopyButton
+                  value={activity.transactionId}
+                  label="Copy transaction id"
+                />
               </div>
             </div>
 
             {/* Amount + time */}
             <div className="flex-none text-right">
               <p className="font-mono text-xs font-medium text-muted-foreground">
-                -{amount}
+                -{activity.amountDisplay}
               </p>
               <p className="text-xs text-muted-foreground/50">
-                {activity.time}
+                {relativeTime(activity.createdAt)}
               </p>
             </div>
           </div>

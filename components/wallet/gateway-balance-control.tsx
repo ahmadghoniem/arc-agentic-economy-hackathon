@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 import { cn } from "@/lib/utils"
 
 type GatewayBalanceControlProps = {
@@ -29,6 +30,30 @@ export function GatewayBalanceControl({
     "deposit"
   )
   const [isOpen, setIsOpen] = React.useState(false)
+  const [value, setValue] = React.useState("")
+  const [error, setError] = React.useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const deposit = useOmniClawStore((state) => state.deposit)
+  const withdraw = useOmniClawStore((state) => state.withdraw)
+
+  const submit = async () => {
+    if (!value.trim()) return
+    setIsSubmitting(true)
+    setError(null)
+    try {
+      if (activeTab === "deposit") {
+        await deposit(value.trim())
+      } else {
+        await withdraw(value.trim())
+      }
+      setValue("")
+      setIsOpen(false)
+    } catch (err) {
+      setError(String(err))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="flex h-8 items-center overflow-hidden rounded-lg border border-divider bg-card">
@@ -96,11 +121,15 @@ export function GatewayBalanceControl({
             </div>
             <Input
               placeholder="0.00"
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
               className="h-8 flex-1 border-divider bg-background px-2.5 py-1 font-mono text-xl text-foreground focus-visible:border-primary"
             />
             <Button
               type="button"
               size="icon"
+              disabled={isSubmitting || !value.trim()}
+              onClick={submit}
               className="size-8 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <PaperPlaneRightIcon size={16} weight="bold" />
@@ -112,6 +141,7 @@ export function GatewayBalanceControl({
               ? "Moves USDC from EOA wallet to your Gateway balance."
               : "Moves USDC from Gateway balance to your EOA wallet."}
           </p>
+          {error ? <p className="mt-2 text-sm text-risk">{error}</p> : null}
         </PopoverContent>
       </Popover>
     </div>

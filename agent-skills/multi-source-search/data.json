@@ -1,0 +1,230 @@
+{
+  "skill": "Multi-source Search",
+  "description": "Intelligent search across web, scholar, Tavily, and Perplexity Sonar — structured retrieval, citation-backed answers, and deep research.",
+  "url": "https://aisa.one/skills/multi-source-search",
+  "total_endpoints": 12,
+  "price_range": { "min": "$0.0024", "max": "$0.012" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/scholar/search/web",
+      "description": "Web search with structured results",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "max_num_results",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 10)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/scholar/search/scholar",
+      "description": "Academic paper search",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "max_num_results",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 10)"
+        },
+        {
+          "name": "as_ylo",
+          "type": "integer",
+          "required": false,
+          "description": "Year lower bound"
+        },
+        {
+          "name": "as_yhi",
+          "type": "integer",
+          "required": false,
+          "description": "Year upper bound"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/scholar/search/smart",
+      "description": "Hybrid scholar search",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "max_num_results",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 10)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/scholar/explain",
+      "description": "Generate result explanations",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Query to explain"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/perplexity/sonar",
+      "description": "Lightweight search answers with citations",
+      "parameters": [
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "description": "e.g., 'sonar'"
+        },
+        {
+          "name": "messages",
+          "type": "array",
+          "required": true,
+          "description": "Conversation messages"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/perplexity/sonar-pro",
+      "description": "Advanced search answers for complex tasks",
+      "parameters": [
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "description": "e.g., 'sonar-pro'"
+        },
+        {
+          "name": "messages",
+          "type": "array",
+          "required": true,
+          "description": "Conversation messages"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/perplexity/sonar-reasoning-pro",
+      "description": "Analytical reasoning with web search",
+      "parameters": [
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "description": "e.g., 'sonar-reasoning-pro'"
+        },
+        {
+          "name": "messages",
+          "type": "array",
+          "required": true,
+          "description": "Conversation messages"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/perplexity/sonar-deep-research",
+      "description": "Exhaustive research reports",
+      "parameters": [
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "description": "e.g., 'sonar-deep-research'"
+        },
+        {
+          "name": "messages",
+          "type": "array",
+          "required": true,
+          "description": "Conversation messages"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tavily/search",
+      "description": "Tavily search integration",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tavily/extract",
+      "description": "Extract content from URLs",
+      "parameters": [
+        {
+          "name": "urls",
+          "type": "array",
+          "required": true,
+          "description": "URLs to extract content from"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tavily/crawl",
+      "description": "Crawl web pages",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": true,
+          "description": "URL to crawl"
+        },
+        {
+          "name": "max_depth",
+          "type": "integer",
+          "required": false,
+          "description": "Maximum crawl depth"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tavily/map",
+      "description": "Generate site maps",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": true,
+          "description": "URL to map"
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    "Search for the latest news on Circle and USDC.",
+    "Find recent academic papers on autonomous AI agents.",
+    "Generate a 30-day brief on the prediction market industry."
+  ]
+}

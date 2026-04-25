@@ -1,0 +1,363 @@
+{
+  "skill": "MarketPulse",
+  "description": "Complete equity market data — stocks, financials, SEC filings, analyst estimates, insider trading, institutional ownership, earnings press releases, segmented revenues, and macro interest rates.",
+  "url": "https://aisa.one/skills/marketpulse",
+  "total_endpoints": 20,
+  "price_range": { "min": "$0.0005", "max": "$0.002" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/financial/prices",
+      "description": "Historical stock prices (requires interval params)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "interval",
+          "type": "string",
+          "required": true,
+          "description": "'second', 'minute', 'day', 'week', 'month', 'year'"
+        },
+        {
+          "name": "interval_multiplier",
+          "type": "integer",
+          "required": true,
+          "description": "Multiplier for interval, e.g., 5 for 5-minute bars"
+        },
+        {
+          "name": "start_date",
+          "type": "string",
+          "required": true,
+          "description": "Start date YYYY-MM-DD"
+        },
+        {
+          "name": "end_date",
+          "type": "string",
+          "required": true,
+          "description": "End date YYYY-MM-DD"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/news",
+      "description": "Company news by ticker",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Number of news articles to return"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financials",
+      "description": "All financial statements (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual', 'quarterly', or 'ttm'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financials/income-statements",
+      "description": "Income statements (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual', 'quarterly', or 'ttm'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financials/balance-sheets",
+      "description": "Balance sheets (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual', 'quarterly', or 'ttm'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financials/cash-flow-statements",
+      "description": "Cash flow statements (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual', 'quarterly', or 'ttm'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financials/segmented-revenues",
+      "description": "Revenue by segment and geography (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual' or 'quarterly'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financial-metrics/snapshot",
+      "description": "Real-time financial metrics",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/financial-metrics",
+      "description": "Historical metrics (requires period)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual' or 'quarterly'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/analyst-estimates",
+      "description": "EPS estimates",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": false,
+          "description": "'annual' or 'quarterly'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/earnings/press-releases",
+      "description": "Earnings press releases (~2,776 supported tickers)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/insider-trades",
+      "description": "Insider trades",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/institutional-ownership",
+      "description": "Institutional ownership (by ticker or investor)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/filings",
+      "description": "SEC filings",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/filings/items",
+      "description": "SEC filing items (requires filing_type and year)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        },
+        {
+          "name": "filing_type",
+          "type": "string",
+          "required": true,
+          "description": "Filing type, e.g., '10-K', '10-Q', '8-K'"
+        },
+        {
+          "name": "year",
+          "type": "integer",
+          "required": true,
+          "description": "Filing year"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/company/facts",
+      "description": "Company facts (by ticker or CIK)",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock symbol"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/financial/financials/search/screener",
+      "description": "Stock screener",
+      "parameters": [
+        {
+          "name": "filters",
+          "type": "object",
+          "required": true,
+          "description": "JSON object with filter criteria (e.g., pe_ratio, revenue_growth)"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/financial/financials/search/line-items",
+      "description": "Search specific line items across tickers",
+      "parameters": [
+        {
+          "name": "tickers",
+          "type": "array",
+          "required": true,
+          "description": "Array of stock symbols"
+        },
+        {
+          "name": "line_items",
+          "type": "array",
+          "required": true,
+          "description": "Array of line item names (e.g., 'revenue', 'net_income')"
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "required": true,
+          "description": "'annual' or 'quarterly'"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/financial/macro/interest-rates/snapshot",
+      "description": "Current interest rates",
+      "parameters": []
+    },
+    {
+      "method": "GET",
+      "path": "/financial/macro/interest-rates",
+      "description": "Historical rates",
+      "parameters": [
+        {
+          "name": "bank",
+          "type": "string",
+          "required": false,
+          "description": "The central bank to query (e.g., 'fed')"
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    "Get the latest SEC filings for NVDA.",
+    "Full analysis: NVDA price trends, insider trades, analyst estimates, SEC filings.",
+    "Compare recent analyst estimates for MSFT and AAPL."
+  ]
+}

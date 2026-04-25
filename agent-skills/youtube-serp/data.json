@@ -1,0 +1,51 @@
+{
+  "skill": "YouTube SERP",
+  "description": "YouTube SERP — top-ranking videos, channels, and trends for content research, competitor tracking, and keyword discovery.",
+  "url": "https://aisa.one/skills/youtube-serp",
+  "total_endpoints": 1,
+  "price_range": { "min": "$0.0024", "max": "$0.0024" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/youtube/search",
+      "description": "Search YouTube SERP",
+      "parameters": [
+        {
+          "name": "engine",
+          "type": "string",
+          "required": true,
+          "description": "Must be 'youtube'"
+        },
+        {
+          "name": "q",
+          "type": "string",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "gl",
+          "type": "string",
+          "required": false,
+          "description": "Country code (e.g., 'us', 'jp')"
+        },
+        {
+          "name": "hl",
+          "type": "string",
+          "required": false,
+          "description": "Interface language (e.g., 'en', 'ja')"
+        },
+        {
+          "name": "sp",
+          "type": "string",
+          "required": false,
+          "description": "YouTube filter token for pagination/filters"
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    "Find the top YouTube videos about Solana development.",
+    "Search YouTube for videos about AI agents tutorial.",
+    "Find recent creator explainers about stablecoin payments."
+  ]
+}

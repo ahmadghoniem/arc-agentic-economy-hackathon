@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 export function RightSidebar() {
   return (
-    <aside className="hidden h-full w-70 flex-none border-l border-divider bg-background xl:flex xl:flex-col">
+    <aside className="hidden h-full w-80 flex-none border-l border-divider bg-background xl:flex xl:flex-col">
       <div className="flex-none border-b border-divider px-4 py-3">
         <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Seller Services

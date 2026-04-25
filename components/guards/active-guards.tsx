@@ -2,7 +2,6 @@
 
 import {
   ArrowsHorizontalIcon,
-  GaugeIcon,
   LockSimpleIcon,
   ShieldCheckIcon,
   UsersThreeIcon,
@@ -10,19 +9,56 @@ import {
   type Icon,
 } from "@phosphor-icons/react"
 
-import { guardItems } from "@/components/guards/guard-data"
 import type { GuardIcon } from "@/components/guards/types"
+import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 import { cn } from "@/lib/utils"
 
 const guardIcons: Record<GuardIcon, Icon> = {
   wallet: WalletIcon,
   "arrows-horizontal": ArrowsHorizontalIcon,
-  gauge: GaugeIcon,
   "users-three": UsersThreeIcon,
   "shield-check": ShieldCheckIcon,
 }
 
 export function ActiveGuards() {
+  const policy = useOmniClawStore((state) => state.account.policy)
+  const guardItems = [
+    {
+      id: "daily-budget",
+      icon: "wallet" as GuardIcon,
+      label: "Daily Budget",
+      value: policy.dailyMax ? `$${policy.dailyMax}` : "N/A",
+      helper: "Policy limit from OmniClaw wallet config",
+      progress: undefined,
+    },
+    {
+      id: "rate-limit",
+      icon: "arrows-horizontal" as GuardIcon,
+      label: "Rate Limit",
+      value: policy.perMinute ? `${policy.perMinute} req/min` : "N/A",
+      helper: "Request frequency restriction from policy",
+      progress: undefined,
+    },
+    {
+      id: "recipients",
+      icon: "users-three" as GuardIcon,
+      label: "Recipients",
+      value: policy.recipientsMode ?? "N/A",
+      helper: policy.recipientDomains.length
+        ? policy.recipientDomains.join(", ")
+        : "Allowed recipient policy mode",
+      progress: undefined,
+    },
+    {
+      id: "manual-review",
+      icon: "shield-check" as GuardIcon,
+      label: "Review Threshold",
+      value: policy.confirmThreshold ?? "N/A",
+      helper: "Approval threshold from wallet policy",
+      progress: undefined,
+    },
+  ]
+
   return (
     <section className="p-3">
       {/* Section label */}
@@ -30,9 +66,6 @@ export function ActiveGuards() {
         <LockSimpleIcon size={15} weight="fill" className="text-success" />
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Active Guards
-        </span>
-        <span className="ml-auto flex items-center justify-center rounded-full bg-success/15 px-1.5 py-0.5 text-xs font-bold text-success tabular-nums">
-          {guardItems.length}
         </span>
       </div>
 

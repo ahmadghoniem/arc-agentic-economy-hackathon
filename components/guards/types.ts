@@ -1,7 +1,6 @@
 export type GuardIcon =
   | "wallet"
   | "arrows-horizontal"
-  | "gauge"
   | "users-three"
   | "shield-check"
 

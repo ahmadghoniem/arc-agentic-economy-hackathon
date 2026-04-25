@@ -12,9 +12,11 @@ export function WalletBalanceBadge({
   copyValue,
   action,
   icon,
+  unit = "USDC",
 }: WalletBalance & {
   action?: ReactNode
   icon?: ReactNode
+  unit?: string
 }) {
   return (
     <div className="flex h-8 items-center gap-2 rounded-lg border border-divider bg-card px-2">
@@ -28,7 +30,10 @@ export function WalletBalanceBadge({
       )}
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       {/* Amount */}
-      <span className="ml-1 font-mono text-sm text-payment">{amount} USDC</span>
+      <span className="ml-1 font-mono text-sm text-payment">
+        {amount}
+        {unit ? ` ${unit}` : ""}
+      </span>
       {copyValue ? (
         <CopyButton value={copyValue} label={`Copy ${label} address`} />
       ) : null}

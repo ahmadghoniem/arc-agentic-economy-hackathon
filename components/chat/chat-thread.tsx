@@ -84,9 +84,8 @@ export function ChatThread({
                 <PromptSuggestion
                   key={suggestion}
                   size="sm"
-                  variant="outline"
+                  className="h-auto max-w-full px-3 py-2 text-left text-sm whitespace-normal"
                   onClick={() => onSuggestionSelect(suggestion)}
-                  className="h-auto max-w-full justify-start rounded-lg border-divider bg-card px-3 py-2 text-left text-sm whitespace-normal text-muted-foreground hover:text-foreground"
                 >
                   {suggestion}
                 </PromptSuggestion>

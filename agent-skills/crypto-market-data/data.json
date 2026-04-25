@@ -1,0 +1,372 @@
+{
+  "skill": "Crypto Market Data",
+  "description": "Complete cryptocurrency market data — current and historical prices, OHLC candles, token prices by contract address, market-cap rankings, exchange data, categories, trending searches, and crypto news.",
+  "url": "https://aisa.one/skills/crypto-market-data",
+  "total_endpoints": 21,
+  "price_range": { "min": "$0.008", "max": "$0.008" },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/coingecko/simple/price",
+      "description": "Current price for any cryptocurrencies in any supported currencies",
+      "parameters": [
+        {
+          "name": "ids",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated coin IDs (e.g. bitcoin,ethereum)"
+        },
+        {
+          "name": "vs_currencies",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated target currencies (e.g. usd,eur)"
+        },
+        {
+          "name": "include_24hr_change",
+          "type": "boolean",
+          "required": false,
+          "description": "Include 24h price change"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/simple/supported_vs_currencies",
+      "description": "List all supported fiat and crypto currencies for vs_currency parameters",
+      "parameters": []
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/simple/token_price/{platform}",
+      "description": "Price by on-chain contract address",
+      "parameters": [
+        {
+          "name": "platform",
+          "type": "string",
+          "required": true,
+          "description": "Platform ID (e.g. ethereum, binance-smart-chain)"
+        },
+        {
+          "name": "contract_addresses",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated contract addresses"
+        },
+        {
+          "name": "vs_currencies",
+          "type": "string",
+          "required": true,
+          "description": "Target currencies"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}",
+      "description": "Full coin data (description, links, market data, community stats)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID (e.g. bitcoin)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/markets",
+      "description": "Top coins by market cap with price, volume, and 24h change",
+      "parameters": [
+        {
+          "name": "vs_currency",
+          "type": "string",
+          "required": true,
+          "description": "Target currency"
+        },
+        {
+          "name": "order",
+          "type": "string",
+          "required": false,
+          "description": "Sort order (e.g. market_cap_desc)"
+        },
+        {
+          "name": "per_page",
+          "type": "integer",
+          "required": false,
+          "description": "Results per page (max 250)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/list",
+      "description": "Directory of all coins with IDs, symbols, and names",
+      "parameters": [
+        {
+          "name": "include_platform",
+          "type": "boolean",
+          "required": false,
+          "description": "Include platform contract addresses"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}/history",
+      "description": "Historical snapshot for a specific date",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID"
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "required": true,
+          "description": "Date in dd-mm-yyyy format"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}/market_chart",
+      "description": "Market chart (price, volume, cap over time)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID"
+        },
+        {
+          "name": "vs_currency",
+          "type": "string",
+          "required": true,
+          "description": "Target currency"
+        },
+        {
+          "name": "days",
+          "type": "string",
+          "required": true,
+          "description": "Number of days (e.g. 30, 365, max)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}/market_chart/range",
+      "description": "Market chart with explicit UNIX timestamp range",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID"
+        },
+        {
+          "name": "vs_currency",
+          "type": "string",
+          "required": true,
+          "description": "Target currency"
+        },
+        {
+          "name": "from",
+          "type": "integer",
+          "required": true,
+          "description": "UNIX start timestamp"
+        },
+        {
+          "name": "to",
+          "type": "integer",
+          "required": true,
+          "description": "UNIX end timestamp"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}/ohlc",
+      "description": "OHLC candles for a coin",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID"
+        },
+        {
+          "name": "vs_currency",
+          "type": "string",
+          "required": true,
+          "description": "Target currency"
+        },
+        {
+          "name": "days",
+          "type": "string",
+          "required": true,
+          "description": "Number of days (1, 7, 14, 30, 90, 180, 365, max)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{id}/tickers",
+      "description": "Exchange-listed trading pairs for a coin",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Coin ID"
+        },
+        {
+          "name": "order",
+          "type": "string",
+          "required": false,
+          "description": "Sort order (e.g. trust_score_desc)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{platform}/contract/{address}",
+      "description": "Full coin data by contract address",
+      "parameters": [
+        {
+          "name": "platform",
+          "type": "string",
+          "required": true,
+          "description": "Platform ID (e.g. ethereum)"
+        },
+        {
+          "name": "address",
+          "type": "string",
+          "required": true,
+          "description": "Contract address"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/coins/{platform}/contract/{address}/market_chart",
+      "description": "Market chart by contract address",
+      "parameters": [
+        {
+          "name": "platform",
+          "type": "string",
+          "required": true,
+          "description": "Platform ID"
+        },
+        {
+          "name": "address",
+          "type": "string",
+          "required": true,
+          "description": "Contract address"
+        },
+        {
+          "name": "vs_currency",
+          "type": "string",
+          "required": true,
+          "description": "Target currency"
+        },
+        {
+          "name": "days",
+          "type": "string",
+          "required": true,
+          "description": "Number of days"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/categories/list",
+      "description": "All category IDs and names",
+      "parameters": []
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/categories",
+      "description": "Category leaderboard with market cap, volume, and top coins",
+      "parameters": [
+        {
+          "name": "order",
+          "type": "string",
+          "required": false,
+          "description": "Sort order (e.g. market_cap_desc)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/exchanges",
+      "description": "Exchanges with current trading volume and metadata",
+      "parameters": [
+        {
+          "name": "per_page",
+          "type": "integer",
+          "required": false,
+          "description": "Results per page"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/exchanges/list",
+      "description": "Exchange ID-to-name map for resolving user input",
+      "parameters": []
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/exchanges/{id}",
+      "description": "Detailed data for a specific exchange",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Exchange ID (e.g. binance)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/exchanges/{id}/tickers",
+      "description": "Trading pairs on a specific exchange",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Exchange ID"
+        },
+        {
+          "name": "order",
+          "type": "string",
+          "required": false,
+          "description": "Sort order (e.g. trust_score_desc)"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/news",
+      "description": "Latest crypto news articles",
+      "parameters": []
+    },
+    {
+      "method": "GET",
+      "path": "/coingecko/search/trending",
+      "description": "Top trending coin searches on CoinGecko",
+      "parameters": []
+    }
+  ],
+  "suggestions": [
+    "What is the current price of ETH and BTC?",
+    "Compare SOL, ETH, and BTC price trends this week.",
+    "Show the top crypto assets by 24-hour volume."
+  ]
+}
