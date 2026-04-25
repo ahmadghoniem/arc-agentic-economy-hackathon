@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon, VaultIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,12 +28,20 @@ export function GatewayBalanceControl({
 
   return (
     <div className="flex h-8 items-center overflow-hidden rounded-full border border-divider bg-card">
-      <div className="flex h-full items-center px-3">
+      {/* Label + amount */}
+      <div className="flex h-full items-center gap-2 px-3">
+        <VaultIcon
+          size={14}
+          weight="duotone"
+          className="flex-none text-muted-foreground/70"
+        />
         <span className="text-sm font-medium text-muted-foreground">
           {label}
         </span>
-        <span className="ml-1 font-mono text-sm text-payment">{amount}</span>
+        <span className="font-mono text-sm text-payment">{amount} USDC</span>
       </div>
+
+      {/* Trigger button */}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger
           render={
@@ -45,17 +53,18 @@ export function GatewayBalanceControl({
             />
           }
         >
-          <ArrowsDownUpIcon size={16} weight="bold" />
+          <ArrowsDownUpIcon size={14} weight="bold" />
           <span className="sr-only">Open gateway transfer</span>
         </PopoverTrigger>
+
         <PopoverContent
           side="bottom"
           align="end"
-          sideOffset={9}
-          className="w-95 rounded-t-none border-x border-t-0 border-b border-divider bg-background px-3 py-2 text-foreground shadow-xl"
+          sideOffset={6}
+          className="w-96 gap-px rounded-xl border border-divider bg-card p-3 text-foreground shadow-xl"
         >
           <div className="flex items-center gap-2">
-            <div className="flex rounded-lg border border-divider bg-card p-0.5">
+            <div className="flex rounded-lg border border-divider bg-background p-0.5">
               <button
                 type="button"
                 onClick={() => setActiveTab("deposit")}
@@ -83,20 +92,20 @@ export function GatewayBalanceControl({
             </div>
             <Input
               placeholder="0.00"
-              className="h-8 w-20 flex-1 border-divider bg-card px-2.5 py-1 font-mono text-xl text-foreground focus-visible:border-primary"
+              className="h-8 flex-1 border-divider bg-background px-2.5 py-1 font-mono text-xl text-foreground focus-visible:border-primary"
             />
             <Button
               type="button"
               size="sm"
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              submit
+              Submit
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             {activeTab === "deposit"
               ? "Moves USDC from EOA wallet to your Gateway balance."
-              : "Moves USDC from Gateway balance to your Circle wallet."}
+              : "Moves USDC from Gateway balance to your EOA wallet."}
           </p>
         </PopoverContent>
       </Popover>

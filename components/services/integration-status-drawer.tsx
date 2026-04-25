@@ -39,7 +39,7 @@ export function IntegrationStatusDrawer() {
   const ToggleIcon = isOpen ? CaretDownIcon : CaretUpIcon
 
   return (
-    <section className="border-t border-divider bg-background px-4 py-3">
+    <section className="border-t border-divider bg-background p-3">
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}

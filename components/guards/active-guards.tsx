@@ -24,14 +24,14 @@ const guardIcons: Record<GuardIcon, Icon> = {
 
 export function ActiveGuards() {
   return (
-    <section className="p-4">
+    <section className="p-3">
       {/* Section label */}
-      <div className="mb-3 flex items-center gap-2">
-        <LockSimpleIcon size={11} weight="fill" className="text-success" />
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+      <div className="mb-2 flex items-center gap-2">
+        <LockSimpleIcon size={13} weight="fill" className="text-success" />
+        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Active Guards
         </span>
-        <span className="ml-auto flex size-4 items-center justify-center rounded-full bg-success/15 text-[9px] font-bold tabular-nums text-success">
+        <span className="ml-auto flex items-center justify-center rounded-full bg-success/15 px-1.5 py-0.5 text-xs font-bold text-success tabular-nums">
           {guardItems.length}
         </span>
       </div>
@@ -46,7 +46,7 @@ export function ActiveGuards() {
             <div
               key={guard.id}
               className={cn(
-                "group relative py-2.5",
+                "group relative py-2",
                 !isLast && "border-b border-divider/60"
               )}
             >
@@ -54,7 +54,7 @@ export function ActiveGuards() {
                 {/* Icon + label */}
                 <div className="flex min-w-0 items-center gap-2">
                   <GuardIcon
-                    size={13}
+                    size={15}
                     weight="duotone"
                     className="flex-none text-muted-foreground/70"
                   />
@@ -63,7 +63,7 @@ export function ActiveGuards() {
                   </span>
                 </div>
                 {/* Value */}
-                <span className="flex-none font-mono text-[13px] font-medium text-payment">
+                <span className="flex-none font-mono text-sm font-medium text-payment">
                   {guard.value}
                 </span>
               </div>
@@ -82,7 +82,7 @@ export function ActiveGuards() {
               )}
 
               {/* Helper */}
-              <p className="mt-1 text-[11px] leading-none text-muted-foreground/60">
+              <p className="mt-1 text-xs leading-none text-muted-foreground/60">
                 {guard.helper}
               </p>
             </div>

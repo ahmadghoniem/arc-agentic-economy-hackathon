@@ -106,174 +106,99 @@
 }
 
 @keyframes typing {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(-2px);
-    opacity: 1;
-  }
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-2px); opacity: 1; }
 }
-
 @keyframes loading-dots {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
-
 @keyframes wave {
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-  50% {
-    transform: scaleY(0.6);
-  }
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.6); }
 }
-
 @keyframes text-blink {
-  0%,
-  100% {
-    color: var(--primary);
-  }
-  50% {
-    color: var(--muted-foreground);
-  }
+  0%, 100% { color: var(--primary); }
+  50% { color: var(--muted-foreground); }
 }
-
 @keyframes bounce-dots {
-  0%,
-  100% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
 }
-
 @keyframes thin-pulse {
-  0%,
-  100% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.4;
-  }
+  0%, 100% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.4; }
 }
-
 @keyframes pulse-dot {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.5); opacity: 1; }
 }
-
 @keyframes shimmer {
-  0% {
-    background-position: 200% 50%;
-  }
-  100% {
-    background-position: -200% 50%;
-  }
+  0% { background-position: 200% 50%; }
+  100% { background-position: -200% 50%; }
 }
-
 @keyframes wave-bars {
-  0%,
-  100% {
-    transform: scaleY(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scaleY(0.6);
-    opacity: 1;
-  }
+  0%, 100% { transform: scaleY(1); opacity: 0.5; }
+  50% { transform: scaleY(0.6); opacity: 1; }
 }
-
 @keyframes spinner-fade {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 :root {
   --font-sans: "Satoshi", system-ui, sans-serif;
   --font-heading: "Satoshi", system-ui, sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    monospace;
-  --background: #101014;
-  --foreground: #f5f6fa;
-  --card: #18181c;
-  --card-foreground: #f5f6fa;
-  --popover: #18181c;
-  --popover-foreground: #f5f6fa;
-  --primary: #a78bfa;
-  --primary-foreground: #18181c;
-  --secondary: #23232a;
-  --secondary-foreground: #e0e0e6;
-  --muted: #2b2b2f;
-  --muted-foreground: #9b9baa;
-  --accent: #23232a;
-  --accent-foreground: #f2f2f2;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Codex-inspired: true near-black, neutral grays, white primary, no color accent */
+  --background: #0d0d0d;
+  --foreground: #ebebeb;
+  --card: #141414;
+  --card-foreground: #ebebeb;
+  --popover: #1a1a1a;
+  --popover-foreground: #ebebeb;
+  --primary: #e8e8e8;
+  --primary-foreground: #0d0d0d;
+  --secondary: #1c1c1c;
+  --secondary-foreground: #d0d0d0;
+  --muted: #242424;
+  --muted-foreground: #777777;
+  --accent: #1c1c1c;
+  --accent-foreground: #ebebeb;
   --destructive: #f43f5e;
-  --border: #23232a;
-  --input: #23232a;
-  --ring: #a78bfa;
-  --chart-1: #a78bfa;
+  --border: #272727;
+  --input: #1c1c1c;
+  --ring: #e8e8e8;
+  --chart-1: #e8e8e8;
   --chart-2: #06d484;
-  --chart-3: #60a5fa;
+  --chart-3: #50aa83;
   --chart-4: #fbbf24;
-  --chart-5: #ef4f78;
-  --sidebar: #101014;
-  --sidebar-foreground: #f5f6fa;
-  --sidebar-primary: #a78bfa;
-  --sidebar-primary-foreground: #18181c;
-  --sidebar-accent: #18181c;
-  --sidebar-accent-foreground: #f5f6fa;
-  --sidebar-border: #23232a;
-  --sidebar-ring: #a78bfa;
+  --chart-5: #f43f5e;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #ebebeb;
+  --sidebar-primary: #e8e8e8;
+  --sidebar-primary-foreground: #0d0d0d;
+  --sidebar-accent: #141414;
+  --sidebar-accent-foreground: #ebebeb;
+  --sidebar-border: #272727;
+  --sidebar-ring: #e8e8e8;
   --success: #06d484;
   --payment: #50aa83;
   --pending: #fbbf24;
   --route: #60a5fa;
-  --risk: #ef4f78;
-  --service: #a78bfa;
-  --divider: #23232a;
+  --risk: #f43f5e;
+  --service: #e8e8e8;
+  --divider: #272727;
   --radius: 0.625rem;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
+  html { @apply font-sans; }
 }
 
-html,
-body,
-* {
+html, body, * {
   font-family: "Satoshi", system-ui, sans-serif;
 }

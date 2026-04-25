@@ -23,14 +23,14 @@ export function Payments() {
 
           {/* Service path + time */}
           <div className="min-w-0 flex-1">
-            <p className="truncate font-mono text-[12px] text-foreground/80">
+            <p className="truncate font-mono text-xs text-foreground/80">
               {tx.service}
             </p>
-            <p className="text-[11px] text-muted-foreground/50">{tx.time}</p>
+            <p className="text-xs text-muted-foreground/50">{tx.time}</p>
           </div>
 
           {/* Amount */}
-          <span className="flex-none font-mono text-[12px] font-medium text-payment">
+          <span className="flex-none font-mono text-xs font-medium text-payment">
             ${tx.amount}
           </span>
         </div>

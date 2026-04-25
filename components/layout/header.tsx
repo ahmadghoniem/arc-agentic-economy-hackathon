@@ -30,15 +30,11 @@ export function Header() {
   return (
     <header className="relative z-20 flex h-12 flex-none items-center border-b border-divider bg-background px-4">
       {/* Brand — left */}
-      <div className="flex w-[280px] flex-none items-center gap-2.5">
-        <span className="relative flex size-1.5">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
-          <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
-        </span>
+      <div className="flex flex-none items-center gap-2.5">
         <h1 className="text-sm font-semibold tracking-wide text-foreground uppercase">
           Omniclaw
         </h1>
-        <span className="rounded border border-divider px-1.5 py-px text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+        <span className="rounded border border-divider px-1.5 py-px text-xs font-medium tracking-wider text-muted-foreground uppercase">
           Console
         </span>
       </div>

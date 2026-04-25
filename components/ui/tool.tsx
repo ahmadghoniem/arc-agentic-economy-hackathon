@@ -45,7 +45,9 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
   const getStateIcon = () => {
     switch (state) {
       case "input-streaming":
-        return <SpinnerGapIcon className="h-3.5 w-3.5 animate-spin text-route" />
+        return (
+          <SpinnerGapIcon className="h-3.5 w-3.5 animate-spin text-route" />
+        )
       case "input-available":
         return <GearIcon className="h-3.5 w-3.5 text-pending" />
       case "output-available":
@@ -134,36 +136,40 @@ const Tool = ({ toolPart, defaultOpen = false, className }: ToolProps) => {
             "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
           )}
         >
-          <div className="space-y-2 bg-background p-2.5">
+          <div className="space-y-2 bg-card p-2.5">
             {input && Object.keys(input).length > 0 && (
               <div>
-                <h4 className="mb-1.5 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                <h4 className="mb-1.5 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                   Request body
                 </h4>
-                <CodeBlock>
-                  <CodeBlockCode
-                    code={formatValue(input)}
-                    language="json"
-                    theme="github-dark"
-                    className="text-xs [&>pre]:px-2.5 [&>pre]:py-2"
-                  />
-                </CodeBlock>
+                <div className="overflow-hidden rounded-md border border-divider bg-background">
+                  <CodeBlock>
+                    <CodeBlockCode
+                      code={formatValue(input)}
+                      language="json"
+                      theme="github-dark"
+                      className="text-xs [&>pre]:bg-background! [&>pre]:px-2.5 [&>pre]:py-2"
+                    />
+                  </CodeBlock>
+                </div>
               </div>
             )}
 
             {output && (
               <div>
-                <h4 className="mb-1.5 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                <h4 className="mb-1.5 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                   Response
                 </h4>
-                <CodeBlock>
-                  <CodeBlockCode
-                    code={formatValue(output)}
-                    language="json"
-                    theme="github-dark"
-                    className="text-xs [&>pre]:px-2.5 [&>pre]:py-2"
-                  />
-                </CodeBlock>
+                <div className="overflow-hidden rounded-md border border-divider bg-background">
+                  <CodeBlock>
+                    <CodeBlockCode
+                      code={formatValue(output)}
+                      language="json"
+                      theme="github-dark"
+                      className="text-xs [&>pre]:bg-background! [&>pre]:px-2.5 [&>pre]:py-2"
+                    />
+                  </CodeBlock>
+                </div>
               </div>
             )}
 

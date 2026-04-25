@@ -24,17 +24,17 @@ export function ServiceCatalog() {
                 className="flex-none text-muted-foreground/0 transition-colors group-hover:text-muted-foreground/60"
               />
             </div>
-            <p className="mt-0.5 truncate pl-3 text-[11px] text-muted-foreground/60">
+            <p className="mt-0.5 truncate pl-3 text-xs text-muted-foreground/60">
               {service.desc}
             </p>
           </div>
 
           {/* Right: price */}
           <div className="flex-none pt-0.5 text-right">
-            <span className="font-mono text-[11px] text-payment">
+            <span className="font-mono text-xs text-payment">
               ${service.price}
             </span>
-            <p className="text-[10px] text-muted-foreground/50">/ call</p>
+            <p className="text-xs text-muted-foreground/50">/ call</p>
           </div>
         </div>
       ))}

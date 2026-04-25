@@ -28,7 +28,7 @@ export function Withdrawals() {
             {/* Label + hash */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[12px] text-foreground/80">Withdraw</span>
+                <span className="text-xs text-foreground/80">Withdraw</span>
                 <span
                   className={cn(
                     "size-1.5 rounded-full",
@@ -37,7 +37,7 @@ export function Withdrawals() {
                 />
               </div>
               <div className="mt-0.5 flex items-center gap-1">
-                <span className="font-mono text-[11px] text-muted-foreground/50">
+                <span className="font-mono text-xs text-muted-foreground/50">
                   {activity.hash}
                 </span>
                 <CopyButton value={activity.hash} label="Copy hash" />
@@ -46,10 +46,10 @@ export function Withdrawals() {
 
             {/* Amount + time */}
             <div className="flex-none text-right">
-              <p className="font-mono text-[12px] font-medium text-muted-foreground">
+              <p className="font-mono text-xs font-medium text-muted-foreground">
                 -{amount}
               </p>
-              <p className="text-[11px] text-muted-foreground/50">
+              <p className="text-xs text-muted-foreground/50">
                 {activity.time}
               </p>
             </div>

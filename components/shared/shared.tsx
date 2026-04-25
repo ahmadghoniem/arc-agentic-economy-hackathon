@@ -41,12 +41,12 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
             type="button"
             variant="ghost"
             size="icon-xs"
-            className="text-muted-foreground hover:text-foreground"
+            className="size-5 text-muted-foreground hover:text-foreground"
             onClick={() => copyText(value)}
           />
         }
       >
-        <CopyIcon size={12} weight="bold" />
+        <CopyIcon size={14} weight="bold" />
         <span className="sr-only">{label}</span>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

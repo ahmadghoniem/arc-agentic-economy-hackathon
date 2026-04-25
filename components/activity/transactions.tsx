@@ -8,16 +8,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 export function Transactions() {
   return (
     <section>
-      <div className="mb-3 flex items-center gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Activity
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          Gateway Activity
         </span>
       </div>
       <Tabs defaultValue="payments" className="gap-3">
         <TabsList variant="line" className="w-full justify-start gap-4">
-          <TabsTrigger value="payments" className="text-xs">Payments</TabsTrigger>
-          <TabsTrigger value="deposits" className="text-xs">Deposits</TabsTrigger>
-          <TabsTrigger value="withdrawals" className="text-xs">Withdrawals</TabsTrigger>
+          <TabsTrigger value="payments" className="text-xs">
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="deposits" className="text-xs">
+            Deposits
+          </TabsTrigger>
+          <TabsTrigger value="withdrawals" className="text-xs">
+            Withdrawals
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="payments" className="mt-3">
