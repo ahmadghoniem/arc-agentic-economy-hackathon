@@ -606,7 +606,7 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
       activity: { ...state.activity, status: "loading", error: null },
     }))
     try {
-      const payload = await fetchJson("/api/omniclaw/transactions?limit=50")
+      const payload = await fetchJson("/api/omniclaw/transactions?limit=200")
       set((state) => ({
         activity: {
           ...state.activity,
