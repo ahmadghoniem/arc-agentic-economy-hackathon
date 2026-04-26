@@ -18,6 +18,10 @@ export const modelGroups: ModelGroup[] = [
     provider: "GEMINI",
     models: ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
   },
+  {
+    provider: "AIVML",
+    models: ["gpt-4o-mini", "mistral-small"],
+  },
 ]
 
 export const endpoints = [
@@ -35,7 +39,7 @@ export const skillData: SkillData[] = [
     skill: "twitter-autopilot",
     label: "Twitter Autopilot",
     suggestions: [
-      "Get the latest tweets from @elonmusk.",
+      "Who created Linux and how many Twitter followers do they have?",
       "How many followers does @sama have?",
       "What are the top trending topics on Twitter right now?",
     ],
@@ -44,7 +48,7 @@ export const skillData: SkillData[] = [
     skill: "multi-source-search",
     label: "Multi-Source Search",
     suggestions: [
-      "Search for the latest news on Circle and USDC.",
+      "What is the weather in Delhi?",
       "Find recent academic papers on autonomous AI agents.",
       "Generate a 30-day brief on the prediction market industry.",
     ],
@@ -62,7 +66,7 @@ export const skillData: SkillData[] = [
     skill: "crypto-market-data",
     label: "Crypto Market Data",
     suggestions: [
-      "What is the current price of ETH and BTC?",
+      "Get market data for USDC.",
       "Compare SOL, ETH, and BTC price trends this week.",
       "Show the top crypto assets by 24-hour volume.",
     ],
@@ -80,7 +84,7 @@ export const skillData: SkillData[] = [
     skill: "marketpulse",
     label: "MarketPulse",
     suggestions: [
-      "Get the latest SEC filings for NVDA.",
+      "Find docs for x402.",
       "Full analysis: NVDA price trends, insider trades, analyst estimates, SEC filings.",
       "Compare recent analyst estimates for MSFT and AAPL.",
     ],

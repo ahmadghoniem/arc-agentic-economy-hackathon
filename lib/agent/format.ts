@@ -12,9 +12,19 @@ import { createId } from "@/lib/utils/id"
  * Maps a model id to its provider so the API routes know which client to use.
  * `auto` lets the server pick when we can't tell.
  */
-export function inferProvider(model: string): "auto" | "gemini" | "featherless" {
+export function inferProvider(
+  model: string
+): "auto" | "gemini" | "featherless" | "aivml" {
+  const lower = model.toLowerCase()
   if (model.startsWith("gemini-")) return "gemini"
-  if (model.includes("/") || model.toLowerCase().includes("qwen"))
+  if (
+    lower.includes("gpt-") ||
+    lower.includes("mistral-") ||
+    lower.includes("claude-")
+  ) {
+    return "aivml"
+  }
+  if (model.includes("/") || lower.includes("qwen"))
     return "featherless"
   return "auto"
 }
@@ -31,15 +41,24 @@ export function formatUSDC(value: string | number | undefined) {
  * a generic "payment accepted" marker.
  */
 export function buildPaymentProof(executedSteps: Array<Record<string, unknown>>) {
+  const explorerBase =
+    process.env.NEXT_PUBLIC_ARC_EXPLORER_URL || "https://testnet.arcscan.app"
   const lines: string[] = []
   for (const step of executedSteps) {
     const payment = step.payment as Record<string, unknown> | undefined
     const data = payment?.data as Record<string, unknown> | undefined
     const txHash = String(data?.tx_hash || data?.transaction_hash || "")
+    const arcscanUrl =
+      String(data?.arcscan_url || "") ||
+      (txHash ? `${explorerBase}/tx/${txHash}` : "")
     const txId = String(data?.transaction_id || "")
     const apiId = String(step.apiId || step.toolId || "API")
     if (txHash) {
-      lines.push(`- ${apiId}: tx ${txHash}`)
+      lines.push(
+        arcscanUrl
+          ? `- ${apiId}: ${txHash} | ArcScan: ${arcscanUrl}`
+          : `- ${apiId}: tx ${txHash}`
+      )
     } else if (txId) {
       lines.push(`- ${apiId}: transaction ${txId}`)
     } else if (payment?.ok) {

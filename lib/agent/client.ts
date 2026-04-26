@@ -1,14 +1,23 @@
 import type { AgentPlan } from "@/lib/agent/types"
-import type { ProviderId } from "@/lib/agent/model-registry"
 
-export type ProviderOption = "auto" | ProviderId
+export type ProviderOption = "auto" | "gemini" | "featherless" | "aivml"
+
+export type ModelEntry = {
+  provider: "gemini" | "featherless" | "aivml"
+  id: string
+  label: string
+  enabled: boolean
+  requiresEnv: string
+}
+
+export type ModelGroup = {
+  provider: "gemini" | "featherless" | "aivml"
+  models: ModelEntry[]
+}
 
 const REQUEST_TIMEOUT_MS = 45_000
 
-async function request<T>(
-  path: string,
-  body?: Record<string, unknown>
-): Promise<T> {
+async function request<T>(path: string, body?: Record<string, unknown>): Promise<T> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 
@@ -21,14 +30,11 @@ async function request<T>(
       signal: controller.signal,
     })
 
-    const payload = (await response.json().catch(() => ({}))) as Record<
-      string,
-      unknown
-    >
+    const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>
     if (!response.ok) {
       return {
         ok: false,
-        error: String(payload.error || `Request failed (${response.status})`),
+        error: String(payload?.error || `Request failed (${response.status})`),
       } as T
     }
     return payload as T
@@ -47,37 +53,26 @@ async function request<T>(
   }
 }
 
+export function getAgentModels() {
+  return request<{ ok: boolean; groups: ModelGroup[] }>("/api/agent/models")
+}
+
 export function getAgentPlan(input: {
   provider: ProviderOption
   model: string
   prompt: string
-  endpointFocus: string
+  endpointFocus?: string
 }) {
   return request<AgentPlan>("/api/agent/plan", input)
 }
 
-export function getAgentPreamble(input: {
-  provider: ProviderOption
-  model: string
-  prompt: string
-}) {
-  return request<{
-    ok: boolean
-    provider: string
-    text: string
-    error?: string
-  }>("/api/agent/preamble", input)
-}
-
-export function executeAgentPlan(input: {
-  plan: AgentPlan
-  confirmed: boolean
-}) {
+export function executeAgentPlan(input: { plan: AgentPlan; confirmed: boolean }) {
   return request<{
     ok: boolean
     error?: string
     steps?: Array<Record<string, unknown>>
     totalPaidUSDC?: string
+    finalContext?: Record<string, unknown>
   }>("/api/agent/execute-plan", input)
 }
 
@@ -87,22 +82,23 @@ export function getFinalAnswer(input: {
   originalPrompt: string
   executedSteps: Array<Record<string, unknown>>
 }) {
-  return request<{
-    ok: boolean
-    provider: string
-    answer: string
-    error?: string
-  }>("/api/agent/final-answer", input)
+  return request<{ ok: boolean; provider: string; answer: string; error?: string }>(
+    "/api/agent/final-answer",
+    input
+  )
 }
 
-/**
- * Streams the final answer as plain text chunks. Yields each chunk as it
- * arrives so the UI can append tokens to a chat bubble in real time.
- *
- * The route always returns *something* readable — even on provider failure
- * it falls back to a deterministic summary — so the caller can simply
- * concatenate every chunk it receives.
- */
+export function getAgentPreamble(input: {
+  provider: ProviderOption
+  model: string
+  prompt: string
+}) {
+  return request<{ ok: boolean; provider?: string; text?: string; error?: string }>(
+    "/api/agent/preamble",
+    input
+  )
+}
+
 export async function* getFinalAnswerStream(input: {
   provider: AgentPlan["provider"]
   model: string
@@ -117,15 +113,22 @@ export async function* getFinalAnswerStream(input: {
   })
 
   if (!response.ok || !response.body) {
-    throw new Error(`Final answer stream failed (${response.status})`)
+    const fallback = await getFinalAnswer(input)
+    yield fallback.answer || "Unable to generate final answer."
+    return
   }
 
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
-  while (true) {
-    const { value, done } = await reader.read()
-    if (done) break
-    const text = decoder.decode(value, { stream: true })
-    if (text) yield text
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      if (value) {
+        yield decoder.decode(value, { stream: true })
+      }
+    }
+  } finally {
+    reader.releaseLock()
   }
 }

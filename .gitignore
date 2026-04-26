@@ -30,7 +30,16 @@ pnpm-debug.log*
 
 # env files
 .env*.local
+.env
+backend/.env
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local python env and logs
+.venv/
+backend/__pycache__/
+*.pyc
+backend/tmp_uvicorn_out.log
+backend/tmp_uvicorn_err.log

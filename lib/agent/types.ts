@@ -1,18 +1,18 @@
-export type AgentProvider = "gemini" | "featherless" | "fallback"
-
 export type AgentPlanStep = {
   id: string
+  apiId?: string
   toolId: string
-  apiId: string
   toolName: string
   reason: string
+  endpoint: string
   estimatedCostUSDC: string
   input: Record<string, unknown>
+  dependsOn?: string[]
 }
 
 export type AgentPlan = {
   ok: boolean
-  provider: AgentProvider
+  provider: "gemini" | "featherless" | "aivml" | "fallback"
   originalPrompt: string
   summary: string
   steps: AgentPlanStep[]

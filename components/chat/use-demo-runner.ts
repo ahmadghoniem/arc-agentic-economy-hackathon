@@ -85,6 +85,10 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
 
   // Wallet policy fuels the real Step 4 guard assessment.
   const policy = useOmniClawStore((state) => state.account.policy)
+  const refreshTransactions = useOmniClawStore(
+    (state) => state.refreshTransactions
+  )
+  const refreshBalance = useOmniClawStore((state) => state.refreshBalance)
 
   // ── Derived state ──────────────────────────────────────────────────────────
   const hasTrace = steps.some((step) => step.status !== "pending")
@@ -158,7 +162,7 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
         if (res.ok && res.text) {
           setMessages((curr) =>
             curr.map((m) =>
-              m.id === preambleId ? { ...m, content: res.text } : m
+              m.id === preambleId ? { ...m, content: res.text ?? "" } : m
             )
           )
           // Once the user sees a confidence-instilling reply, swap the
@@ -180,7 +184,7 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
       if (!isCurrent()) return
       setShowInitialLoader(false)
 
-      if (!plan.ok || !plan.steps.length) {
+      if (!plan.ok) {
         patch(1, {
           status: "failed",
           subtitle: plan.message || "Could not find matching endpoints.",
@@ -191,6 +195,25 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
             id: createId("assistant"),
             role: "assistant",
             content: plan.message || "Planning failed. Please try again.",
+          },
+        ])
+        setIsProcessing(false)
+        return
+      }
+
+      if (!plan.steps.length) {
+        patch(1, {
+          status: "completed",
+          subtitle: "No paid API call required for this prompt.",
+        })
+        setMessages((curr) => [
+          ...curr,
+          {
+            id: createId("assistant"),
+            role: "assistant",
+            content:
+              plan.message ||
+              "No paid API was needed. Ask me a task and I'll plan paid calls when relevant.",
           },
         ])
         setIsProcessing(false)
@@ -345,9 +368,17 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
       status: "completed",
       subtitle: `Total spent: ${formatUSDC(execution.totalPaidUSDC)} — ${allPaySubs.length} endpoint(s) called.`,
     })
+    void Promise.all([refreshTransactions(), refreshBalance()])
     setPlanRequest(null)
     setIsProcessing(false)
-  }, [isProcessing, planRequest, policy, withRun])
+  }, [
+    isProcessing,
+    planRequest,
+    policy,
+    refreshBalance,
+    refreshTransactions,
+    withRun,
+  ])
 
   // ── Cancel plan ───────────────────────────────────────────────────────────
   const cancelPlan = React.useCallback(() => {

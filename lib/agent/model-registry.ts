@@ -1,4 +1,4 @@
-export type ProviderId = "gemini" | "featherless"
+export type ProviderId = "gemini" | "featherless" | "aivml"
 
 export type ModelRegistryEntry = {
   provider: ProviderId
@@ -17,16 +17,9 @@ function parseModelList(value: string | undefined, fallback: string[]) {
 }
 
 export function getModelRegistry(): ModelRegistryEntry[] {
-  const geminiModels = parseModelList(process.env.GEMINI_MODEL, [
-    "gemini-2.5-flash-lite",
-    "gemini-2.5-flash",
-  ])
-  const featherlessModels = parseModelList(process.env.FEATHERLESS_MODEL, [
-    "Qwen/Qwen3-8B",
-    "Qwen/Qwen3-14B",
-    "Qwen/Qwen3-30B-A3B",
-    "mistralai/Mistral-Nemo-Instruct-2407",
-  ])
+  const geminiModels = parseModelList(process.env.GEMINI_MODEL, ["gemini-2.5-flash", "gemini-2.0-flash"])
+  const featherlessModels = parseModelList(process.env.FEATHERLESS_MODEL, ["qwen3.5-plus", "claude-haiku-4-5", "nemotron-super-free"])
+  const aivmlModels = parseModelList(process.env.AIVML_MODEL, ["gpt-4o-mini", "mistral-small"])
 
   const registry: ModelRegistryEntry[] = []
 
@@ -50,7 +43,22 @@ export function getModelRegistry(): ModelRegistryEntry[] {
     })
   }
 
+  for (const model of aivmlModels) {
+    registry.push({
+      provider: "aivml",
+      id: model,
+      label: model,
+      enabled: Boolean(process.env.AIVML_API_KEY) && Boolean(process.env.AIVML_BASE_URL),
+      requiresEnv: "AIVML_API_KEY,AIVML_BASE_URL",
+    })
+  }
+
   return registry
+}
+
+export function pickDefaultModel(provider: ProviderId): string {
+  const registry = getModelRegistry().filter((entry) => entry.provider === provider)
+  return registry[0]?.id ?? ""
 }
 
 export function inferProviderFromModel(model: string): ProviderId | null {
@@ -62,5 +70,6 @@ export function getProviderAvailability() {
   return {
     gemini: Boolean(process.env.GEMINI_API_KEY),
     featherless: Boolean(process.env.FEATHERLESS_API_KEY),
+    aivml: Boolean(process.env.AIVML_API_KEY) && Boolean(process.env.AIVML_BASE_URL),
   }
 }

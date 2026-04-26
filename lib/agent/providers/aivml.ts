@@ -55,26 +55,31 @@ async function openAICompatChat(input: {
   return String(payload.choices?.[0]?.message?.content || "")
 }
 
-export async function featherlessPlan(input: {
+export async function aivmlPlan(input: {
   model: string
   prompt: string
   availableTools: Array<{ id: string; name: string; endpoint: string; priceUSDC: string | null; aliases: string[] }>
 }): Promise<ProviderCallResult> {
-  const apiKey = process.env.FEATHERLESS_API_KEY
-  if (!apiKey) {
-    return { ok: false, provider: "featherless", error: "FEATHERLESS_API_KEY is missing" }
+  const apiKey = process.env.AIVML_API_KEY
+  const baseUrl = process.env.AIVML_BASE_URL
+
+  if (!apiKey || !baseUrl) {
+    return {
+      ok: false,
+      provider: "aivml",
+      error: "AIVML_API_KEY or AIVML_BASE_URL is missing",
+    }
   }
 
-  const model = input.model || (process.env.FEATHERLESS_MODEL?.split(",")[0]) || "Qwen/Qwen2.5-72B-Instruct"
-  const baseUrl = process.env.FEATHERLESS_BASE_URL || "https://api.featherless.ai/v1"
+  const model = input.model || (process.env.AIVML_MODEL?.split(",")[0]) || "gpt-4o-mini"
 
   const prompt = [
     "Return JSON only.",
     "Choose only from availableTools.",
     "Do not create payment intents.",
     "Do not execute payments.",
-    "You may return zero steps if no approved paid tool is needed.",
-    "For shopping/purchase/buy intents, prefer 'product_discovery'.",
+    "IMPORTANT: You MUST always select at least one tool. If no specific tool matches, use 'general_assistant' as a catch-all.",
+    "For shopping/purchase/buy intents, ALWAYS use 'product_discovery'.",
     '{"summary":"string","steps":[{"toolId":"string","reason":"string","input":{}}],"message":"string"}',
     `User prompt: ${input.prompt}`,
     `availableTools: ${JSON.stringify(input.availableTools)}`,
@@ -91,32 +96,32 @@ export async function featherlessPlan(input: {
 
     const parsed = parsePlan(content)
     if (!parsed) {
-      return { ok: false, provider: "featherless", error: "Featherless returned invalid JSON plan" }
+      return { ok: false, provider: "aivml", error: "AIVML returned invalid JSON plan" }
     }
 
-    return { ok: true, provider: "featherless", data: parsed }
+    return { ok: true, provider: "aivml", data: parsed }
   } catch (error) {
     return {
       ok: false,
-      provider: "featherless",
-      error: error instanceof Error ? error.message : "Featherless call failed",
+      provider: "aivml",
+      error: error instanceof Error ? error.message : "AIVML call failed",
     }
   }
 }
 
-export async function featherlessSummarize(input: {
+export async function aivmlSummarize(input: {
   model: string
   originalPrompt: string
   executedSteps: unknown
 }): Promise<ProviderAnswerResult> {
-  const apiKey = process.env.FEATHERLESS_API_KEY
-  if (!apiKey) {
-    return { ok: false, error: "FEATHERLESS_API_KEY is missing" }
+  const apiKey = process.env.AIVML_API_KEY
+  const baseUrl = process.env.AIVML_BASE_URL
+
+  if (!apiKey || !baseUrl) {
+    return { ok: false, error: "AIVML_API_KEY or AIVML_BASE_URL is missing" }
   }
 
-  const model = input.model || (process.env.FEATHERLESS_MODEL?.split(",")[0]) || "Qwen/Qwen2.5-72B-Instruct"
-  const baseUrl = process.env.FEATHERLESS_BASE_URL || "https://api.featherless.ai/v1"
-
+  const model = input.model || (process.env.AIVML_MODEL?.split(",")[0]) || "gpt-4o-mini"
   const prompt = [
     "Provide final user-facing answer from executed API responses.",
     "Do not claim AI executed payments.",
@@ -130,37 +135,7 @@ export async function featherlessSummarize(input: {
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : "Featherless summary failed",
-    }
-  }
-}
-
-export async function featherlessPreamble(input: {
-  model: string
-  prompt: string
-}): Promise<ProviderAnswerResult> {
-  const apiKey = process.env.FEATHERLESS_API_KEY
-  if (!apiKey) {
-    return { ok: false, error: "FEATHERLESS_API_KEY is missing" }
-  }
-
-  const model = input.model || (process.env.FEATHERLESS_MODEL?.split(",")[0]) || "Qwen/Qwen2.5-72B-Instruct"
-  const baseUrl = process.env.FEATHERLESS_BASE_URL || "https://api.featherless.ai/v1"
-
-  const prompt = [
-    "Write one short friendly acknowledgement to the user's task.",
-    "Do not mention payments yet.",
-    "Keep it under 20 words.",
-    `User prompt: ${input.prompt}`,
-  ].join("\n")
-
-  try {
-    const content = await openAICompatChat({ baseUrl, apiKey, model, prompt })
-    return { ok: true, text: content.trim() }
-  } catch (error) {
-    return {
-      ok: false,
-      error: error instanceof Error ? error.message : "Featherless preamble failed",
+      error: error instanceof Error ? error.message : "AIVML summary failed",
     }
   }
 }

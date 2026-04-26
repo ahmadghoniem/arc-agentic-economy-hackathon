@@ -1,18 +1,6 @@
-/**
- * /api/agent/final-answer-stream
- *
- * Returns the final answer as a streamed plain-text response.
- *
- * Strategy: use the same non-streaming featherlessSummarize() that the
- * preamble uses (via openAICompatChat) — it's proven to work. Once we have
- * the full text we emit it as a single chunk so the client still gets a
- * ReadableStream and the existing streaming consumer in use-demo-runner works
- * without any changes.
- *
- * Gemini is kept as a secondary fallback if Featherless fails.
- */
 export const runtime = "nodejs"
 
+import { aivmlSummarize } from "@/lib/agent/providers/aivml"
 import { featherlessSummarize } from "@/lib/agent/providers/featherless"
 import { geminiSummarize } from "@/lib/agent/providers/gemini"
 
@@ -34,6 +22,89 @@ const RESPONSE_HEADERS = {
   "X-Accel-Buffering": "no",
 }
 
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return "N/A"
+  if (typeof value === "string") return value
+  if (typeof value === "number" || typeof value === "boolean") return String(value)
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "object" && item !== null ? JSON.stringify(item) : String(item)))
+      .join(", ")
+  }
+  if (typeof value === "object") return JSON.stringify(value)
+  return String(value)
+}
+
+function deterministicSummary(originalPrompt: string, executedSteps: ExecutedStep[]) {
+  const parts: string[] = []
+  for (const step of executedSteps) {
+    const toolId = String(step.toolId || "api_call")
+    const response = (step.response as Record<string, unknown> | undefined) || {}
+    const data = (response.data as Record<string, unknown> | undefined) || {}
+    const entries = Object.entries(data).filter(([k]) => k !== "localPaidApiDemo")
+    if (!entries.length) continue
+
+    const formatted = entries
+      .map(([key, val]) => `${key}: ${formatValue(val)}`)
+      .join("\n")
+    parts.push(`${toolId}\n${formatted}`)
+  }
+
+  if (!parts.length) {
+    return `I completed the approved API workflow for: "${originalPrompt}".`
+  }
+
+  return `Result for "${originalPrompt}":\n\n${parts.join("\n\n")}`
+}
+
+async function summarizeWithProvider(input: {
+  provider: string
+  model: string
+  originalPrompt: string
+  executedSteps: ExecutedStep[]
+}) {
+  const { provider, model, originalPrompt, executedSteps } = input
+
+  if (provider === "gemini") {
+    const r = await geminiSummarize({ model, originalPrompt, executedSteps })
+    if (r.ok && r.text) return r.text
+  }
+  if (provider === "featherless") {
+    const r = await featherlessSummarize({ model, originalPrompt, executedSteps })
+    if (r.ok && r.text) return r.text
+  }
+  if (provider === "aivml") {
+    const r = await aivmlSummarize({ model, originalPrompt, executedSteps })
+    if (r.ok && r.text) return r.text
+  }
+
+  // Auto fallback order: provider inferred by model first, then others.
+  const lower = model.toLowerCase()
+  const inferred =
+    model.startsWith("gemini-")
+      ? "gemini"
+      : lower.includes("gpt-") || lower.includes("mistral-") || lower.includes("claude-")
+        ? "aivml"
+        : "featherless"
+
+  for (const candidate of [inferred, "gemini", "featherless", "aivml"]) {
+    if (candidate === "gemini") {
+      const r = await geminiSummarize({ model, originalPrompt, executedSteps })
+      if (r.ok && r.text) return r.text
+    }
+    if (candidate === "featherless") {
+      const r = await featherlessSummarize({ model, originalPrompt, executedSteps })
+      if (r.ok && r.text) return r.text
+    }
+    if (candidate === "aivml") {
+      const r = await aivmlSummarize({ model, originalPrompt, executedSteps })
+      if (r.ok && r.text) return r.text
+    }
+  }
+
+  return deterministicSummary(originalPrompt, executedSteps)
+}
+
 export async function POST(request: Request) {
   let body: {
     provider?: string
@@ -47,72 +118,22 @@ export async function POST(request: Request) {
     return new Response("Invalid JSON body", { status: 400 })
   }
 
-  const model = body.model ?? ""
-  const originalPrompt = String(body.originalPrompt ?? "")
-  const executedSteps = Array.isArray(body.executedSteps)
-    ? body.executedSteps
-    : []
+  const provider = String(body.provider || "auto")
+  const model = String(body.model || "")
+  const originalPrompt = String(body.originalPrompt || "")
+  const executedSteps = Array.isArray(body.executedSteps) ? body.executedSteps : []
 
   if (!originalPrompt) {
     return new Response("originalPrompt is required", { status: 400 })
   }
 
-  // Resolve a single Featherless model ID — never read FEATHERLESS_MODEL from
-  // env here, that var holds a comma-separated list for the registry dropdown.
-  const featherlessModel =
-    model && !model.startsWith("gemini-") ? model : "Qwen/Qwen3-8B"
-
-  console.log(
-    `[final-answer-stream] model="${model}" → featherlessModel="${featherlessModel}"`
-  )
-
-  // ── Try Featherless (same path as preamble — proven to work) ──────────────
-  const featherlessResult = await featherlessSummarize({
-    model: featherlessModel,
+  const answer = await summarizeWithProvider({
+    provider,
+    model,
     originalPrompt,
     executedSteps,
-  }).catch((err) => {
-    console.error("[final-answer-stream] featherlessSummarize threw:", err)
-    return { ok: false as const, error: String(err) }
   })
 
-  if (featherlessResult.ok && featherlessResult.text) {
-    console.log("[final-answer-stream] Featherless succeeded")
-    return new Response(textStream(featherlessResult.text), {
-      headers: RESPONSE_HEADERS,
-    })
-  }
-  console.error(
-    "[final-answer-stream] Featherless failed:",
-    featherlessResult.error
-  )
-
-  // ── Gemini fallback ───────────────────────────────────────────────────────
-  const geminiResult = await geminiSummarize({
-    model: "gemini-2.0-flash-lite",
-    originalPrompt,
-    executedSteps,
-  }).catch((err) => {
-    console.error("[final-answer-stream] geminiSummarize threw:", err)
-    return { ok: false as const, error: String(err) }
-  })
-
-  if (geminiResult.ok && geminiResult.text) {
-    console.log("[final-answer-stream] Gemini fallback succeeded")
-    return new Response(textStream(geminiResult.text), {
-      headers: RESPONSE_HEADERS,
-    })
-  }
-  console.error(
-    "[final-answer-stream] Gemini fallback failed:",
-    geminiResult.error
-  )
-
-  // ── Last resort ───────────────────────────────────────────────────────────
-  const fallbackText =
-    executedSteps.length > 0
-      ? "I retrieved data for your request but couldn't format it with the AI model right now. Please try again."
-      : "No data was returned for your request."
-
-  return new Response(textStream(fallbackText), { headers: RESPONSE_HEADERS })
+  return new Response(textStream(answer), { headers: RESPONSE_HEADERS })
 }
+

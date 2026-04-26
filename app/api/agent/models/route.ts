@@ -4,7 +4,8 @@ import { getModelRegistry } from "@/lib/agent/model-registry"
 
 export async function GET() {
   const entries = getModelRegistry()
-  const groups = ["gemini", "featherless"].map((provider) => ({
+
+  const groups = ["gemini", "featherless", "aivml"].map((provider) => ({
     provider,
     models: entries.filter((entry) => entry.provider === provider),
   }))

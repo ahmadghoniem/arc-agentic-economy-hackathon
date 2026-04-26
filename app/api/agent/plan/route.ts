@@ -1,20 +1,24 @@
 import { NextResponse } from "next/server"
 
+import { getAvailableTools } from "@/lib/agent/api-catalog"
 import { planAgentTask } from "@/lib/agent/ai-planner"
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
-      provider?: "auto" | "gemini" | "featherless"
+      provider?: "auto" | "gemini" | "featherless" | "aivml"
       model?: string
       prompt?: string
-      endpointFocus?: string
     }
 
     const prompt = String(body.prompt || "").trim()
     if (!prompt) {
       return NextResponse.json(
-        { ok: false, error: "prompt is required", steps: [] },
+        {
+          ok: false,
+          error: "prompt is required",
+          steps: [],
+        },
         { status: 400 }
       )
     }
@@ -23,7 +27,7 @@ export async function POST(request: Request) {
       provider: body.provider || "auto",
       model: body.model || "",
       prompt,
-      endpointFocus: body.endpointFocus || "Auto",
+      availableTools: getAvailableTools(),
     })
 
     return NextResponse.json(plan)

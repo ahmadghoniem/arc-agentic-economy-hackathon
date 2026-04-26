@@ -21,6 +21,7 @@ export type PaymentActivity = {
   amountAtomic: number
   amountDisplay: string
   transactionId: string
+  arcscanUrl?: string
   status: ActivityStatus
   createdAt: string
   recipient: string
@@ -149,11 +150,43 @@ function findTemplate(apiId: string) {
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init)
-  const payload = (await res.json().catch(() => ({}))) as ApiResult<T>
-  if (!res.ok || !payload.success) {
-    throw new Error(payload.error || `${res.status} ${res.statusText}`)
+  const payload = (await res.json().catch(() => ({}))) as
+    | ApiResult<T>
+    | { ok?: boolean; error?: string | null; data?: T; detail?: unknown }
+    | Record<string, unknown>
+
+  if (!res.ok) {
+    const detail =
+      typeof (payload as { error?: unknown }).error === "string"
+        ? String((payload as { error?: unknown }).error)
+        : typeof (payload as { detail?: unknown }).detail === "string"
+          ? String((payload as { detail?: unknown }).detail)
+          : `${res.status} ${res.statusText}`
+    throw new Error(detail)
   }
-  return payload.data as T
+
+  if ("success" in payload) {
+    if (!payload.success) {
+      throw new Error(
+        typeof payload.error === "string" ? payload.error : "Request failed"
+      )
+    }
+    return payload.data as T
+  }
+
+  if ("ok" in payload) {
+    const normalized = payload as {
+      ok?: boolean
+      error?: string | null
+      data?: T
+    }
+    if (!normalized.ok) {
+      throw new Error(normalized.error || "Request failed")
+    }
+    return normalized.data as T
+  }
+
+  return payload as T
 }
 
 function toNumber(value: unknown, fallback = 0) {
@@ -298,24 +331,36 @@ function normalizePayments(payload: unknown): PaymentActivity[] {
   const record = payload as Record<string, unknown>
   const transactions = Array.isArray(record?.transactions)
     ? record.transactions
-    : []
+    : Array.isArray(record?.items)
+      ? record.items
+      : []
 
   return transactions.map((entry, index) => {
     const tx = entry as Record<string, unknown>
-    const transactionId = String(tx.id || `tx_${index}`)
-    const recipient = String(tx.recipient || "")
+    const txHash = String(tx.tx_hash || tx.transaction_hash || "")
+    const transactionId = String(txHash || tx.transactionId || tx.id || `tx_${index}`)
+    const recipient = String(tx.recipient || tx.destination || "")
     const amount = formatPaymentAmount(tx.amount)
+    const explorerBase =
+      process.env.NEXT_PUBLIC_ARC_EXPLORER_URL || "https://testnet.arcscan.app"
+    const arcscanUrl =
+      String(tx.arcscan_url || "") ||
+      (txHash ? `${explorerBase}/tx/${txHash}` : "")
+    const endpoint =
+      String(tx.endpoint || tx.source || tx.destination || tx.recipient || "").trim() ||
+      "payment"
 
     return {
       id: transactionId,
-      apiName: shortenEndpoint(recipient),
+      apiName: shortenEndpoint(endpoint),
       amountAtomic: amount.amountAtomic,
       amountDisplay: amount.amountDisplay,
       transactionId,
+      arcscanUrl: arcscanUrl || undefined,
       status: normalizeStatus(tx.status),
       createdAt: String(tx.created_at || new Date().toISOString()),
       recipient,
-      method: "x402",
+      method: String(tx.payment_method || tx.method || "x402"),
     }
   })
 }
@@ -441,14 +486,20 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
             state.account.gatewayOnchainBalanceAtomic
           ),
           circleWalletBalance: balanceRecord.circle_wallet_balance
-            ? String(balanceRecord.circle_wallet_balance)
+            ? String(balanceRecord.circle_wallet_balance).replace(/[^0-9.\-]/g, "")
             : state.account.circleWalletBalance,
           eoaUsdcBalanceAtomic:
             explorerSnapshot?.eoaUsdcBalanceAtomic ??
+            toNumber(balanceRecord.eoa_balance_atomic, existingSnapshot.eoaUsdcBalanceAtomic) ??
             existingSnapshot.eoaUsdcBalanceAtomic,
           eoaUsdcBalanceDisplay:
             explorerSnapshot?.eoaUsdcBalanceDisplay ??
-            existingSnapshot.eoaUsdcBalanceDisplay,
+            formatAtomicUsdc(
+              toNumber(
+                balanceRecord.eoa_balance_atomic,
+                existingSnapshot.eoaUsdcBalanceAtomic
+              )
+            ),
           policy:
             wallets.status === "fulfilled"
               ? extractWalletPolicy(wallets.value)
@@ -519,14 +570,20 @@ export const useOmniClawStore = create<OmniClawState>((set, get) => ({
             state.account.gatewayOnchainBalanceAtomic
           ),
           circleWalletBalance: balanceRecord.circle_wallet_balance
-            ? String(balanceRecord.circle_wallet_balance)
+            ? String(balanceRecord.circle_wallet_balance).replace(/[^0-9.\-]/g, "")
             : state.account.circleWalletBalance,
           eoaUsdcBalanceAtomic:
             explorerSnapshot?.eoaUsdcBalanceAtomic ??
+            toNumber(balanceRecord.eoa_balance_atomic, existingSnapshot.eoaUsdcBalanceAtomic) ??
             existingSnapshot.eoaUsdcBalanceAtomic,
           eoaUsdcBalanceDisplay:
             explorerSnapshot?.eoaUsdcBalanceDisplay ??
-            existingSnapshot.eoaUsdcBalanceDisplay,
+            formatAtomicUsdc(
+              toNumber(
+                balanceRecord.eoa_balance_atomic,
+                existingSnapshot.eoaUsdcBalanceAtomic
+              )
+            ),
           status: "success",
           error: null,
         },

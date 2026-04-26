@@ -43,6 +43,16 @@ export function Payments() {
               >
                 {formatTruncatedHash(tx.transactionId)}
               </span>
+              {tx.arcscanUrl ? (
+                <a
+                  href={tx.arcscanUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-payment underline-offset-2 hover:underline"
+                >
+                  ArcScan
+                </a>
+              ) : null}
               <CopyButton
                 value={tx.transactionId}
                 label="Copy transaction id"

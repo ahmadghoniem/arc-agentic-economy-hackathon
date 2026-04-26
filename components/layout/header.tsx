@@ -45,6 +45,13 @@ export function Header() {
       .finally(() => setIsRefreshing(false))
   }
 
+  const circleAmount = (() => {
+    const raw = String(account.circleWalletBalance || "0").replace(/[^0-9.\-]/g, "")
+    const parsed = Number(raw)
+    if (!Number.isFinite(parsed)) return "0.000000"
+    return parsed.toFixed(6)
+  })()
+
   return (
     <header className="relative z-20 flex h-12 flex-none items-center border-b border-divider bg-background px-4">
       {/* Brand — left */}
@@ -67,7 +74,7 @@ export function Header() {
           />
           <WalletBalanceBadge
             label="Circle"
-            amount={account.circleWalletBalance || "0.00"}
+            amount={circleAmount}
             copyValue={account.circleWalletAddress ?? undefined}
             icon={
               <CurrencyCircleDollarIcon
