@@ -1,7 +1,6 @@
 "use client"
 
 import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Payments } from "@/components/activity/payments"
 import { Deposits } from "@/components/activity/deposits"
 import { Withdrawals } from "@/components/activity/withdrawals"
@@ -58,25 +57,25 @@ export function Transactions() {
           value="payments"
           className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden"
         >
-          <ScrollArea className="min-h-0 flex-1 pr-4">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-2 [scrollbar-color:var(--border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/80 [&::-webkit-scrollbar-track]:bg-transparent">
             <Payments />
-          </ScrollArea>
+          </div>
         </TabsContent>
         <TabsContent
           value="deposits"
           className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden"
         >
-          <ScrollArea className="min-h-0 flex-1 pr-4">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-2 [scrollbar-color:var(--border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/80 [&::-webkit-scrollbar-track]:bg-transparent">
             <Deposits />
-          </ScrollArea>
+          </div>
         </TabsContent>
         <TabsContent
           value="withdrawals"
           className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden"
         >
-          <ScrollArea className="min-h-0 flex-1 pr-4">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-2 [scrollbar-color:var(--border)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/80 [&::-webkit-scrollbar-track]:bg-transparent">
             <Withdrawals />
-          </ScrollArea>
+          </div>
         </TabsContent>
       </Tabs>
     </section>
