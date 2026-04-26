@@ -42,20 +42,11 @@ export type ClarificationRequest = {
   originalPrompt: string
 }
 
-/**
- * useDemoRunner
- *
- * Thin orchestrator that wires together:
- *   - chat message state + persistence
- *   - trace step state (via useTraceSteps)
- *   - the plan/execute/final-answer pipeline (phase helpers in
- *     execution-phases.ts)
- *
- * Keeps each concern small enough to follow without scrolling. Heavier
- * logic lives in the phase helpers and the agent-format utilities.
- */
 export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
-  // ── Chat messages ──────────────────────────────────────────────────────────
+  const submitLockRef = React.useRef(false)
+  const confirmLockRef = React.useRef(false)
+  const latestProductResultsRef = React.useRef<Array<Record<string, unknown>>>([])
+
   const [messages, setMessages] = React.useState<ChatMessage[]>(() =>
     loadFromStorage(CHAT_STORAGE_KEYS.messages, [])
   )
@@ -63,10 +54,8 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     saveToStorage(CHAT_STORAGE_KEYS.messages, messages)
   }, [messages])
 
-  // ── Trace steps ────────────────────────────────────────────────────────────
   const { steps, resetSteps, withRun, patchOnce } = useTraceSteps()
 
-  // ── Flow state ─────────────────────────────────────────────────────────────
   const [isProcessing, setIsProcessing] = React.useState(false)
   const [showInitialLoader, setShowInitialLoader] = React.useState(false)
   const [planRequest, setPlanRequest] = React.useState<PlanRequest | null>(() =>
@@ -83,14 +72,12 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
   >(null)
   const [totalPaidUSDC, setTotalPaidUSDC] = React.useState<string>("0")
 
-  // Wallet policy fuels the real Step 4 guard assessment.
   const policy = useOmniClawStore((state) => state.account.policy)
   const refreshTransactions = useOmniClawStore(
     (state) => state.refreshTransactions
   )
   const refreshBalance = useOmniClawStore((state) => state.refreshBalance)
 
-  // ── Derived state ──────────────────────────────────────────────────────────
   const hasTrace = steps.some((step) => step.status !== "pending")
   const totalSpent = formatUSDC(totalPaidUSDC)
   const apiCalls =
@@ -101,276 +88,296 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
   const finalAssistantMessage = finalAssistantMessageId
     ? (messages.find((m) => m.id === finalAssistantMessageId) ?? null)
     : null
-  // Hide empty placeholder messages (e.g. while the preamble is in flight).
   const visibleMessages = (
     finalAssistantMessage
       ? messages.filter((m) => m.id !== finalAssistantMessage.id)
       : messages
   ).filter((m) => m.role === "user" || m.content.trim().length > 0)
 
-  // ── Step 1 + 2: Plan ──────────────────────────────────────────────────────
   const submitMessage = React.useCallback(
     async (input: string) => {
-      const prompt = input.trim()
-      if (!prompt || isProcessing || planRequest || clarificationRequest) return
-
-      // Clarification gate (pre-planning)
-      if (needsClarification(prompt)) {
-        setMessages((curr) => [
-          ...curr,
-          { id: createId("user"), role: "user", content: prompt },
-        ])
-        setClarificationRequest({
-          originalPrompt: prompt,
-          value: "",
-          paramName: "Twitter handle",
-          message:
-            "What's your Twitter handle? I need it to check that relationship.",
-        })
+      const rawPrompt = input.trim()
+      let prompt = rawPrompt
+      const lowerPrompt = rawPrompt.toLowerCase()
+      if (
+        (lowerPrompt.includes("first one") ||
+          lowerPrompt.includes("second one") ||
+          lowerPrompt.includes("third one")) &&
+        latestProductResultsRef.current.length > 0
+      ) {
+        const index = lowerPrompt.includes("second one")
+          ? 1
+          : lowerPrompt.includes("third one")
+            ? 2
+            : 0
+        const selected = latestProductResultsRef.current[index]
+        if (selected) {
+          const name = String(selected.name || "")
+          const buyUrl = String(selected.buyUrl || "")
+          const priceUsd = String(selected.priceUsd || "")
+          prompt =
+            `${rawPrompt}\nSelected product: ${name}\nBuy URL: ${buyUrl}\nPrice USD: $${priceUsd}\nSelection index: ${index + 1}`
+        }
+      }
+      if (
+        !prompt ||
+        isProcessing ||
+        planRequest ||
+        clarificationRequest ||
+        submitLockRef.current
+      ) {
         return
       }
 
-      const { patch, isCurrent } = withRun()
+      submitLockRef.current = true
+      try {
+        if (needsClarification(prompt)) {
+          setMessages((curr) => [
+            ...curr,
+            { id: createId("user"), role: "user", content: prompt },
+          ])
+          setClarificationRequest({
+            originalPrompt: prompt,
+            value: "",
+            paramName: "Twitter handle",
+            message:
+              "What's your Twitter handle? I need it to check that relationship.",
+          })
+          return
+        }
 
-      const userMessageId = createId("user")
-      const preambleId = createId("assistant")
-      setMessages((curr) => [
-        ...curr,
-        { id: userMessageId, role: "user", content: prompt },
-        // Empty placeholder — preamble streams in here. We don't show the
-        // empty message thanks to the `content` check in the chat thread.
-        { id: preambleId, role: "assistant", content: "" },
-      ])
-      resetSteps()
-      setPlanRequest(null)
-      setClarificationRequest(null)
-      setFinalAssistantMessageId(null)
-      setIsProcessing(true)
-      setShowInitialLoader(true)
+        const { patch, isCurrent } = withRun()
+        const userMessageId = createId("user")
+        const preambleId = createId("assistant")
 
-      // Step 1 — Reviewing your request
-      patch(1, { status: "active", subtitle: "Analyzing your prompt..." })
+        setMessages((curr) => [
+          ...curr,
+          { id: userMessageId, role: "user", content: prompt },
+          { id: preambleId, role: "assistant", content: "" },
+        ])
+        resetSteps()
+        setPlanRequest(null)
+        setClarificationRequest(null)
+        setFinalAssistantMessageId(null)
+        setIsProcessing(true)
+        setShowInitialLoader(true)
 
-      // Fire preamble + plan in parallel. Preamble is short and usually
-      // resolves first; if it fails we just leave the placeholder empty.
-      const preamblePromise = getAgentPreamble({
-        provider: inferProvider(selectedModel),
-        model: selectedModel,
-        prompt,
-      }).then((res) => {
-        if (!isCurrent()) return
-        if (res.ok && res.text) {
+        patch(1, { status: "active", subtitle: "Analyzing your prompt..." })
+
+        const preamblePromise = getAgentPreamble({
+          provider: inferProvider(selectedModel),
+          model: selectedModel,
+          prompt,
+        }).then((res) => {
+          if (!isCurrent()) return
+          if (!res.ok || !res.text) return
           setMessages((curr) =>
             curr.map((m) =>
               m.id === preambleId ? { ...m, content: res.text ?? "" } : m
             )
           )
-          // Once the user sees a confidence-instilling reply, swap the
-          // shimmer loader for the inline trace stepper.
           setShowInitialLoader(false)
-        }
-      })
-
-      const plan = await getAgentPlan({
-        provider: inferProvider(selectedModel),
-        model: selectedModel,
-        prompt,
-        endpointFocus: selectedEndpoint,
-      })
-
-      // Don't block on the preamble; it's purely cosmetic.
-      void preamblePromise
-
-      if (!isCurrent()) return
-      setShowInitialLoader(false)
-
-      if (!plan.ok) {
-        patch(1, {
-          status: "failed",
-          subtitle: plan.message || "Could not find matching endpoints.",
         })
-        setMessages((curr) => [
-          ...curr,
-          {
-            id: createId("assistant"),
-            role: "assistant",
-            content: plan.message || "Planning failed. Please try again.",
-          },
-        ])
-        setIsProcessing(false)
-        return
-      }
 
-      if (!plan.steps.length) {
+        const plan = await getAgentPlan({
+          provider: inferProvider(selectedModel),
+          model: selectedModel,
+          prompt,
+          endpointFocus: selectedEndpoint,
+        })
+
+        void preamblePromise
+
+        if (!isCurrent()) return
+        setShowInitialLoader(false)
+
+        if (!plan.ok) {
+          patch(1, {
+            status: "failed",
+            subtitle: plan.message || "Could not find matching endpoints.",
+          })
+          setMessages((curr) => [
+            ...curr,
+            {
+              id: createId("assistant"),
+              role: "assistant",
+              content: plan.message || "Planning failed. Please try again.",
+            },
+          ])
+          setIsProcessing(false)
+          return
+        }
+
+        if (!plan.steps.length) {
+          patch(1, {
+            status: "completed",
+            subtitle: "No paid API call required for this prompt.",
+          })
+          setMessages((curr) => [
+            ...curr,
+            {
+              id: createId("assistant"),
+              role: "assistant",
+              content:
+                plan.message ||
+                "No paid API was needed. Ask me a task and I'll plan paid calls when relevant.",
+            },
+          ])
+          setIsProcessing(false)
+          return
+        }
+
+        const toolNames = plan.steps.map((s) => s.toolName).join(", ")
         patch(1, {
           status: "completed",
-          subtitle: "No paid API call required for this prompt.",
+          subtitle: `${plan.steps.length} tool(s) selected: ${toolNames}.`,
         })
+        patch(2, { status: "active", subtitle: "Awaiting your confirmation..." })
+        setPlanRequest({ plan, model: selectedModel })
+        setIsProcessing(false)
+      } finally {
+        submitLockRef.current = false
+      }
+    },
+    [
+      clarificationRequest,
+      isProcessing,
+      planRequest,
+      resetSteps,
+      selectedEndpoint,
+      selectedModel,
+      withRun,
+    ]
+  )
+
+  const confirmPlan = React.useCallback(async () => {
+    if (!planRequest || isProcessing || confirmLockRef.current) return
+
+    confirmLockRef.current = true
+    try {
+      const { patch, isCurrent } = withRun()
+      setIsProcessing(true)
+      patch(2, { status: "completed", subtitle: "User confirmed execution." })
+
+      const executionPromise = executeAgentPlan({
+        plan: planRequest.plan,
+        confirmed: true,
+      })
+      await animateInspectPreview({
+        plan: planRequest.plan,
+        patch,
+        isCurrent,
+      })
+
+      const execution = await executionPromise
+      if (!isCurrent()) return
+
+      if (execution.ok && execution.totalPaidUSDC) {
+        setTotalPaidUSDC(execution.totalPaidUSDC)
+      }
+      for (const executedStep of execution.steps || []) {
+        if (executedStep.toolId === "product_discovery") {
+          const response = (executedStep.response as Record<string, unknown> | undefined) || {}
+          const data = (response.data as Record<string, unknown> | undefined) || {}
+          const results = data.results
+          if (Array.isArray(results)) {
+            latestProductResultsRef.current = results as Array<Record<string, unknown>>
+          }
+        }
+      }
+
+      if (!execution.ok || !execution.steps) {
+        patch(3, {
+          status: "failed",
+          subtitle: execution.error || "Execution failed.",
+        })
+        patch(5, { status: "failed", subtitle: "No payments made." })
         setMessages((curr) => [
           ...curr,
           {
             id: createId("assistant"),
             role: "assistant",
             content:
-              plan.message ||
-              "No paid API was needed. Ask me a task and I'll plan paid calls when relevant.",
+              execution.error || "Execution failed. No payment was completed.",
           },
         ])
+        setPlanRequest(null)
         setIsProcessing(false)
         return
       }
 
-      const toolNames = plan.steps.map((s) => s.toolName).join(", ")
-      patch(1, {
-        status: "completed",
-        subtitle: `${plan.steps.length} tool(s) selected: ${toolNames}.`,
+      const inspectResult = await replayInspectResults({
+        executedSteps: execution.steps,
+        patch,
+        isCurrent,
       })
+      if (!inspectResult) return
 
-      // Step 2 — Checking API endpoints → wait for confirmation
-      patch(2, { status: "active", subtitle: "Awaiting your confirmation..." })
-      setPlanRequest({ plan, model: selectedModel })
-      setIsProcessing(false)
-    },
-    [
-      isProcessing,
-      planRequest,
-      clarificationRequest,
-      selectedEndpoint,
-      selectedModel,
-      withRun,
-      resetSteps,
-    ]
-  )
-
-  // ── Steps 3 → 6: Execute ──────────────────────────────────────────────────
-  const confirmPlan = React.useCallback(async () => {
-    if (!planRequest || isProcessing) return
-
-    const { patch, isCurrent } = withRun()
-
-    setIsProcessing(true)
-    patch(2, { status: "completed", subtitle: "User confirmed execution." })
-
-    // Fire the real execute call immediately; animate inspect previews while
-    // it's in flight.
-    const executionPromise = executeAgentPlan({
-      plan: planRequest.plan,
-      confirmed: true,
-    })
-    await animateInspectPreview({
-      plan: planRequest.plan,
-      patch,
-      isCurrent,
-    })
-
-    const execution = await executionPromise
-    if (!isCurrent()) return
-
-    if (execution.ok && execution.totalPaidUSDC) {
-      setTotalPaidUSDC(execution.totalPaidUSDC)
-    }
-
-    if (!execution.ok || !execution.steps) {
-      patch(3, {
-        status: "failed",
-        subtitle: execution.error || "Execution failed.",
+      const guards = await runPolicyGuards({
+        policy,
+        executedSteps: execution.steps,
+        totalEstimatedUSDC: inspectResult.totalEstimated,
+        patch,
+        isCurrent,
       })
-      patch(5, { status: "failed", subtitle: "No payments made." })
+      if (!guards) return
+
+      const payResult = await replayPayments({
+        executedSteps: execution.steps,
+        patch,
+        isCurrent,
+      })
+      if (!payResult) return
+
+      patch(6, { status: "active", subtitle: "Generating final answer..." })
+
+      const answerId = createId("assistant")
       setMessages((curr) => [
         ...curr,
-        {
-          id: createId("assistant"),
-          role: "assistant",
-          content:
-            execution.error || "Execution failed. No payment was completed.",
-        },
+        { id: answerId, role: "assistant", content: "" },
       ])
+      setFinalAssistantMessageId(answerId)
+
+      let streamed = ""
+      try {
+        const stream = getFinalAnswerStream({
+          provider: planRequest.plan.provider,
+          model: planRequest.model,
+          originalPrompt: planRequest.plan.originalPrompt,
+          executedSteps: execution.steps,
+        })
+        for await (const chunk of stream) {
+          if (!isCurrent()) return
+          streamed += chunk
+          setMessages((curr) =>
+            curr.map((m) => (m.id === answerId ? { ...m, content: streamed } : m))
+          )
+        }
+      } catch {
+        if (!streamed) {
+          streamed =
+            "I couldn't generate the final provider summary, but OmniClaw returned the execution result."
+        }
+      }
+
+      if (!isCurrent()) return
+
+      const paymentProof = buildPaymentProof(execution.steps)
+      const answer = `${streamed}\n\nTotal paid: ${formatUSDC(execution.totalPaidUSDC)}.\n\nPayment proof:\n${paymentProof}`
+      setMessages((curr) =>
+        curr.map((m) => (m.id === answerId ? { ...m, content: answer } : m))
+      )
+
+      patch(6, {
+        status: "completed",
+        subtitle: `Total spent: ${formatUSDC(execution.totalPaidUSDC)} — ${payResult.subSteps.length} endpoint(s) called.`,
+      })
+      void Promise.all([refreshTransactions(), refreshBalance()])
       setPlanRequest(null)
       setIsProcessing(false)
-      return
+    } finally {
+      confirmLockRef.current = false
     }
-
-    // Step 3 — replace previews with real inspect substeps.
-    const inspectResult = await replayInspectResults({
-      executedSteps: execution.steps,
-      patch,
-      isCurrent,
-    })
-    if (!inspectResult) return
-    const { totalEstimated } = inspectResult
-
-    // Step 4 — real policy-guard assessment.
-    const guards = await runPolicyGuards({
-      policy,
-      executedSteps: execution.steps,
-      totalEstimatedUSDC: totalEstimated,
-      patch,
-      isCurrent,
-    })
-    if (!guards) return
-
-    // Step 5 — payments.
-    const payResult = await replayPayments({
-      executedSteps: execution.steps,
-      patch,
-      isCurrent,
-    })
-    if (!payResult) return
-    const { subSteps: allPaySubs } = payResult
-
-    // Step 6 — final answer (streamed).
-    patch(6, { status: "active", subtitle: "Generating final answer..." })
-
-    // Insert an empty assistant bubble that we'll append tokens to as the
-    // model streams. The bubble is tracked as the "final" message so the UI
-    // renders it at the bottom of the trace.
-    const answerId = createId("assistant")
-    setMessages((curr) => [
-      ...curr,
-      { id: answerId, role: "assistant", content: "" },
-    ])
-    setFinalAssistantMessageId(answerId)
-
-    let streamed = ""
-    try {
-      const stream = getFinalAnswerStream({
-        provider: planRequest.plan.provider,
-        model: planRequest.model,
-        originalPrompt: planRequest.plan.originalPrompt,
-        executedSteps: execution.steps,
-      })
-      for await (const chunk of stream) {
-        if (!isCurrent()) return
-        streamed += chunk
-        setMessages((curr) =>
-          curr.map((m) => (m.id === answerId ? { ...m, content: streamed } : m))
-        )
-      }
-    } catch {
-      // The stream route always emits a fallback, so this only fires for
-      // network failures. Surface a friendly message in that case.
-      if (!streamed) {
-        streamed =
-          "I couldn't generate the final provider summary, but OmniClaw returned the execution result."
-      }
-    }
-
-    if (!isCurrent()) return
-
-    // Append the payment receipt now that streaming has finished.
-    const paymentProof = buildPaymentProof(execution.steps)
-    const answer = `${streamed}\n\nTotal paid: ${formatUSDC(execution.totalPaidUSDC)}.\n\nPayment proof:\n${paymentProof}`
-    setMessages((curr) =>
-      curr.map((m) => (m.id === answerId ? { ...m, content: answer } : m))
-    )
-
-    patch(6, {
-      status: "completed",
-      subtitle: `Total spent: ${formatUSDC(execution.totalPaidUSDC)} — ${allPaySubs.length} endpoint(s) called.`,
-    })
-    void Promise.all([refreshTransactions(), refreshBalance()])
-    setPlanRequest(null)
-    setIsProcessing(false)
   }, [
     isProcessing,
     planRequest,
@@ -380,7 +387,6 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     withRun,
   ])
 
-  // ── Cancel plan ───────────────────────────────────────────────────────────
   const cancelPlan = React.useCallback(() => {
     if (!planRequest) return
     setMessages((curr) => [
@@ -396,9 +402,8 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
       subtitle: "Execution canceled by user.",
     })
     setPlanRequest(null)
-  }, [planRequest, patchOnce])
+  }, [patchOnce, planRequest])
 
-  // ── Clarification ─────────────────────────────────────────────────────────
   const submitClarification = React.useCallback(() => {
     if (!clarificationRequest?.value.trim()) return
     const clarifiedPrompt = `${clarificationRequest.originalPrompt}\nTwitter handle: ${clarificationRequest.value.trim()}`
@@ -418,7 +423,6 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     setClarificationRequest((curr) => (curr ? { ...curr, value } : curr))
   }, [])
 
-  // ── Clear ─────────────────────────────────────────────────────────────────
   const clearChat = React.useCallback(() => {
     setMessages([])
     resetSteps()
@@ -426,6 +430,7 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     setClarificationRequest(null)
     setFinalAssistantMessageId(null)
     setTotalPaidUSDC("0")
+    latestProductResultsRef.current = []
     clearStorage(
       CHAT_STORAGE_KEYS.messages,
       CHAT_STORAGE_KEYS.steps,
@@ -434,21 +439,18 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
   }, [resetSteps])
 
   return {
-    // State
     messages,
     steps,
     isProcessing,
     showInitialLoader,
     clarificationRequest,
     planRequest,
-    // Derived
     hasTrace,
     totalSpent,
     apiCalls,
     sessionTitle,
     finalAssistantMessage,
     visibleMessages,
-    // Actions
     submitMessage,
     submitClarification,
     updateClarificationValue,
@@ -458,5 +460,4 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
   }
 }
 
-// Re-export createInitialSteps for any consumers that imported it transitively.
 export { createInitialSteps }

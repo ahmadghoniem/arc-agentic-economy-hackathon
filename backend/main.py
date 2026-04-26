@@ -13,6 +13,7 @@ try:
     from backend.seller_demo import (
         api_code_docs,
         api_general_assistant,
+        api_product_purchase,
         api_products,
         api_market_data,
         api_search,
@@ -28,6 +29,7 @@ except ModuleNotFoundError:
     from seller_demo import (
         api_code_docs,
         api_general_assistant,
+        api_product_purchase,
         api_products,
         api_market_data,
         api_search,
@@ -68,6 +70,13 @@ class RecipientGuardRequest(BaseModel):
 
 class AmountRequest(BaseModel):
     amount: str = Field(..., min_length=1)
+
+
+class ProductPurchaseRequest(BaseModel):
+    name: str | None = None
+    buyUrl: str | None = None
+    priceUsd: str | float | int | None = None
+    query: str | None = None
 
 
 class SellerStartRequest(BaseModel):
@@ -189,6 +198,16 @@ def api_products_endpoint(
     query: str = Query(default="", description="Alias for product query"),
 ) -> dict[str, Any]:
     return api_products(q or query)
+
+
+@app.post("/api/product-purchase")
+def api_product_purchase_endpoint(payload: ProductPurchaseRequest) -> dict[str, Any]:
+    return api_product_purchase(
+        name=(payload.name or "").strip(),
+        buy_url=(payload.buyUrl or "").strip(),
+        price_usd=payload.priceUsd,
+        query=(payload.query or "").strip(),
+    )
 
 
 @app.get("/api/assistant")

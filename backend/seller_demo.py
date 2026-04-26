@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import os
 import subprocess
+import time
 from typing import Any
 
 _seller_process: subprocess.Popen[str] | None = None
@@ -266,6 +267,73 @@ def api_products(query: str) -> dict[str, Any]:
         "query": q,
         "results": results,
         "count": len(results),
+    }
+
+
+def _find_product_by_url(url: str) -> dict[str, Any] | None:
+    if not url:
+        return None
+    for rows in _PRODUCT_CATALOG.values():
+        for row in rows:
+            if str(row.get("buyUrl")) == url:
+                return row
+    return None
+
+
+def api_product_purchase(
+    *,
+    name: str = "",
+    buy_url: str = "",
+    price_usd: str | float | int | None = None,
+    query: str = "",
+) -> dict[str, Any]:
+    selected = _find_product_by_url(buy_url)
+
+    if not selected and name:
+        lowered_name = name.lower()
+        for rows in _PRODUCT_CATALOG.values():
+            for row in rows:
+                if lowered_name in str(row.get("name", "")).lower():
+                    selected = row
+                    break
+            if selected:
+                break
+
+    if not selected and query:
+        generated = _generate_generic_results(query)
+        selected = generated[0] if generated else None
+
+    if not selected:
+        selected = {
+            "name": name or "Demo Item",
+            "brand": "DemoStore",
+            "category": "General",
+            "priceUsd": float(price_usd) if price_usd not in (None, "") else 4.99,
+            "rating": 4.5,
+            "buyUrl": buy_url or "https://demo.store/products/demo-item",
+        }
+
+    resolved_price = (
+        float(price_usd)
+        if price_usd not in (None, "")
+        else float(selected.get("priceUsd", 4.99))
+    )
+    product_name = str(selected.get("name", "Demo Item"))
+    product_url = str(selected.get("buyUrl", buy_url or "https://demo.store/products/demo-item"))
+    product_brand = str(selected.get("brand", "DemoStore"))
+
+    order_seed = f"{product_url}|{resolved_price}|{time.time()}"
+    order_id = hashlib.sha1(order_seed.encode()).hexdigest()[:16]  # noqa: S324
+
+    return {
+        "localPaidApiDemo": True,
+        "status": "purchased",
+        "orderId": order_id,
+        "name": product_name,
+        "brand": product_brand,
+        "priceUsd": round(resolved_price, 2),
+        "buyUrl": product_url,
+        "message": f"Purchase confirmed for {product_name}.",
     }
 
 

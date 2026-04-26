@@ -140,7 +140,7 @@ export function ChatThread({
 
         {!showInitialLoader && (isProcessing || hasTrace) ? (
           <div className="flex justify-start">
-            <AgentExecutionTrace key={visibleMessages.length} steps={steps} />
+            <AgentExecutionTrace steps={steps} />
           </div>
         ) : null}
 

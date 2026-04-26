@@ -31,18 +31,27 @@ function mapInputToQuery(input: Record<string, unknown>) {
   return query.toString()
 }
 
-async function fetchToolResponse(endpoint: string, input: Record<string, unknown>) {
+async function fetchToolResponse(
+  endpoint: string,
+  method: "GET" | "POST",
+  input: Record<string, unknown>
+) {
   const query = mapInputToQuery(input)
   const url = query ? `${endpoint}${endpoint.includes("?") ? "&" : "?"}${query}` : endpoint
 
   const tryFetch = async (target: string) => {
-    const response = await fetch(target, { method: "GET", cache: "no-store" })
+    const response = await fetch(target, {
+      method,
+      cache: "no-store",
+      headers: method === "POST" ? { "Content-Type": "application/json" } : undefined,
+      body: method === "POST" ? JSON.stringify(input) : undefined,
+    })
     const data = await response.json().catch(async () => ({ text: await response.text() }))
     return { ok: response.ok, status: response.status, data, url: target }
   }
 
   try {
-    return await tryFetch(url)
+    return await tryFetch(method === "GET" ? url : endpoint)
   } catch {
     // If the endpoint is a local seller endpoint, try the backend fallback
     const backendBase = (process.env.OMNICLAW_BACKEND_URL || "http://localhost:8090").replace(/\/$/, "")
@@ -50,7 +59,7 @@ async function fetchToolResponse(endpoint: string, input: Record<string, unknown
       if (endpoint.startsWith(localPrefix)) {
         const path = endpoint.replace(localPrefix.slice(0, -1), "")
         const fallback = `${backendBase}${path}`
-        return tryFetch(query ? `${fallback}?${query}` : fallback)
+        return tryFetch(method === "GET" ? (query ? `${fallback}?${query}` : fallback) : fallback)
       }
     }
     throw new Error("Tool endpoint unreachable")
@@ -106,6 +115,19 @@ export async function POST(request: Request) {
           resolvedInput.name = derivedEntity
         }
       }
+      if (step.toolId === "product_purchase") {
+        const index = Number(resolvedInput.selectionIndex || 0)
+        if ((!resolvedInput.buyUrl || !resolvedInput.priceUsd) && index > 0) {
+          const discovered =
+            (contextByTool.product_discovery?.results as Array<Record<string, unknown>> | undefined) || []
+          const chosen = discovered[index - 1]
+          if (chosen) {
+            resolvedInput.name = resolvedInput.name || chosen.name
+            resolvedInput.buyUrl = resolvedInput.buyUrl || chosen.buyUrl
+            resolvedInput.priceUsd = resolvedInput.priceUsd || chosen.priceUsd
+          }
+        }
+      }
 
       const inspect = await postJson(origin, "/api/omniclaw/inspect", {
         endpoint: step.endpoint,
@@ -140,7 +162,11 @@ export async function POST(request: Request) {
         break
       }
 
-      const toolResponse = await fetchToolResponse(tool.endpoint, resolvedInput)
+      const toolResponse = await fetchToolResponse(
+        tool.endpoint,
+        tool.method || "GET",
+        resolvedInput
+      )
       totalPaid += Number.parseFloat(step.estimatedCostUSDC || "0")
 
       executedSteps.push({
