@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # OmniClaw Main Demo
 
 Frontend console + backend adapter for OmniClaw hackathon demo flows.
