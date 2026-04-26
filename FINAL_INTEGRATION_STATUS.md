@@ -170,3 +170,35 @@ Files:
 - `components/activity/types.ts`
 - `components/activity/activity-data.ts`
 - `components/activity/transactions.tsx`
+
+## 50+ onchain demo runbook
+
+Added automation script and economics proof docs:
+
+- `backend/scripts/generate_onchain_demo.py`
+- `docs/hackathon-economics-proof.md`
+
+Use this to generate judge-verifiable frequency:
+
+```bash
+python backend/scripts/generate_onchain_demo.py --count 55 --amount 0.0005
+```
+
+Output report:
+
+- `backend/demo_tx_report.json`
+
+This report includes:
+
+- successful call count
+- onchain hash count
+- target reached (`>= 50`)
+- per-call ArcScan links where available
+
+## Margin explanation added
+
+Documented in `docs/hackathon-economics-proof.md`:
+
+- per-call revenue baseline (`~$0.00044`)
+- gateway vs Solana L1 vs Base L2 cost comparison
+- explicit unit margin math showing why traditional gas breaks sub-cent pricing

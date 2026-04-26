@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Payments } from "@/components/activity/payments"
 import { Deposits } from "@/components/activity/deposits"
 import { Withdrawals } from "@/components/activity/withdrawals"
+import { TransactionFrequency } from "@/components/activity/transaction-frequency"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -21,6 +22,8 @@ export function Transactions() {
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden">
+      <TransactionFrequency />
+
       <div className="mb-2 flex items-center gap-2">
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Gateway Activity
