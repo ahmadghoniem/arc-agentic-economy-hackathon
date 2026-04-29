@@ -4,7 +4,6 @@ import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 import { Payments } from "@/components/activity/payments"
 import { Deposits } from "@/components/activity/deposits"
 import { Withdrawals } from "@/components/activity/withdrawals"
-import { TransactionFrequency } from "@/components/activity/transaction-frequency"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -13,7 +12,8 @@ export function Transactions() {
     (state) => state.activity.payments.length
   )
   const depositCount = useOmniClawStore(
-    (state) => state.activity.deposits.length + state.activity.explorerDeposits.length
+    (state) =>
+      state.activity.deposits.length + state.activity.explorerDeposits.length
   )
   const withdrawalCount = useOmniClawStore(
     (state) => state.activity.withdrawals.length
@@ -21,8 +21,6 @@ export function Transactions() {
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden">
-      <TransactionFrequency />
-
       <div className="mb-2 flex items-center gap-2">
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Gateway Activity
@@ -33,21 +31,30 @@ export function Transactions() {
         className="min-h-0 flex-1 gap-1 overflow-hidden"
       >
         <TabsList variant="line" className="w-full justify-between gap-1">
-          <TabsTrigger value="payments" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="payments" className="gap-1 px-1 text-[11px]">
             Payments
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[9px] leading-none"
+            >
               {paymentCount}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="deposits" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="deposits" className="gap-1 px-1 text-[11px]">
             Deposits
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[9px] leading-none"
+            >
               {depositCount}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="withdrawals" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="withdrawals" className="gap-1 px-1 text-[11px]">
             Withdrawals
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[9px] leading-none"
+            >
               {withdrawalCount}
             </Badge>
           </TabsTrigger>
