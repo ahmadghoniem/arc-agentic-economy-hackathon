@@ -2,7 +2,6 @@
 
 import {
   ArrowsHorizontalIcon,
-  LockSimpleIcon,
   ShieldCheckIcon,
   UsersThreeIcon,
   WalletIcon,
@@ -63,7 +62,6 @@ export function ActiveGuards() {
     <section className="p-3">
       {/* Section label */}
       <div className="mb-2 flex items-center gap-2">
-        <LockSimpleIcon size={15} weight="fill" className="text-success" />
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Active Guards
         </span>

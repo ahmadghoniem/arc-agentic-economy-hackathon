@@ -1,6 +1,4 @@
-import { API_TEMPLATES } from "@/lib/omniclaw/services"
-
-export type ToolParam = {
+﻿export type ToolParam = {
   name: string
   required: boolean
   type: string
@@ -17,10 +15,6 @@ export type PaidApiTool = {
   method: "GET" | "POST"
   path: string
   priceUSDC: string
-  /** @deprecated use params instead */
-  requiredParams: string[]
-  /** @deprecated use params instead */
-  optionalParams: string[]
   params: ToolParam[]
   aliases: string[]
   allowlisted: boolean
@@ -32,7 +26,7 @@ export type PaidApiTool = {
  * (with descriptions and examples) so the AI can populate step.input correctly.
  */
 export const PAID_API_CATALOG: PaidApiTool[] = [
-  // ── Twitter Autopilot ────────────────────────────────────────────────────
+  // â”€â”€ Twitter Autopilot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "twitter_user_info",
     apiId: "twitter-user-info",
@@ -42,8 +36,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/twitter/user/info",
     priceUSDC: "0.00044",
-    requiredParams: ["userName"],
-    optionalParams: [],
     params: [
       {
         name: "userName",
@@ -65,8 +57,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/twitter/user/last_tweets",
     priceUSDC: "0.00044",
-    requiredParams: ["userName"],
-    optionalParams: ["cursor"],
     params: [
       {
         name: "userName",
@@ -95,8 +85,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/twitter/user/search",
     priceUSDC: "0.00044",
-    requiredParams: ["query"],
-    optionalParams: [],
     params: [
       {
         name: "query",
@@ -118,8 +106,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/twitter/tweet/advanced_search",
     priceUSDC: "0.00044",
-    requiredParams: ["query", "queryType"],
-    optionalParams: [],
     params: [
       {
         name: "query",
@@ -148,8 +134,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/twitter/trends",
     priceUSDC: "0.00044",
-    requiredParams: ["woeid"],
-    optionalParams: [],
     params: [
       {
         name: "woeid",
@@ -163,7 +147,7 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     allowlisted: true,
   },
 
-  // ── Multi-Source Search ──────────────────────────────────────────────────
+  // â”€â”€ Multi-Source Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "multi_search",
     apiId: "multi-search",
@@ -173,8 +157,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/scholar/search/web",
     priceUSDC: "0.0024",
-    requiredParams: ["query"],
-    optionalParams: ["max_num_results"],
     params: [
       {
         name: "query",
@@ -203,8 +185,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/scholar/search/scholar",
     priceUSDC: "0.0024",
-    requiredParams: ["query"],
-    optionalParams: ["max_num_results", "as_ylo", "as_yhi"],
     params: [
       {
         name: "query",
@@ -247,8 +227,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "POST",
     path: "/perplexity/sonar",
     priceUSDC: "0.0036",
-    requiredParams: ["model", "messages"],
-    optionalParams: [],
     params: [
       {
         name: "model",
@@ -269,7 +247,7 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     allowlisted: true,
   },
 
-  // ── YouTube SERP ────────────────────────────────────────────────────────
+  // â”€â”€ YouTube SERP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "youtube_search",
     apiId: "youtube-search",
@@ -279,8 +257,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/youtube/search",
     priceUSDC: "0.0024",
-    requiredParams: ["q"],
-    optionalParams: ["gl", "hl"],
     params: [
       {
         name: "engine",
@@ -315,7 +291,7 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     allowlisted: true,
   },
 
-  // ── Crypto Market Data ───────────────────────────────────────────────────
+  // â”€â”€ Crypto Market Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "crypto_price",
     apiId: "coingecko-price",
@@ -325,14 +301,12 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/coingecko/simple/price",
     priceUSDC: "0.008",
-    requiredParams: ["ids", "vs_currencies"],
-    optionalParams: ["include_24hr_change"],
     params: [
       {
         name: "ids",
         required: true,
         type: "string",
-        description: "CoinGecko coin ID — NOT the ticker symbol. Use the full lowercase slug name. 'bitcoin' not 'btc'. 'ethereum' not 'eth'. 'solana' not 'sol'. 'ripple' not 'xrp'. 'dogecoin' not 'doge'. Comma-separated for multiple coins.",
+        description: "CoinGecko coin ID â€” NOT the ticker symbol. Use the full lowercase slug name. 'bitcoin' not 'btc'. 'ethereum' not 'eth'. 'solana' not 'sol'. 'ripple' not 'xrp'. 'dogecoin' not 'doge'. Comma-separated for multiple coins.",
         example: "bitcoin,ethereum",
       },
       {
@@ -362,8 +336,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/coingecko/coins/markets",
     priceUSDC: "0.008",
-    requiredParams: ["vs_currency"],
-    optionalParams: ["order", "per_page"],
     params: [
       {
         name: "vs_currency",
@@ -399,14 +371,12 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/coingecko/coins/{id}",
     priceUSDC: "0.008",
-    requiredParams: ["id"],
-    optionalParams: [],
     params: [
       {
         name: "id",
         required: true,
         type: "string",
-        description: "CoinGecko coin slug ID — NOT ticker symbol. Use 'bitcoin' not 'BTC', 'ethereum' not 'ETH', 'solana' not 'SOL'.",
+        description: "CoinGecko coin slug ID â€” NOT ticker symbol. Use 'bitcoin' not 'BTC', 'ethereum' not 'ETH', 'solana' not 'SOL'.",
         example: "bitcoin",
       },
     ],
@@ -422,8 +392,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/coingecko/search/trending",
     priceUSDC: "0.008",
-    requiredParams: [],
-    optionalParams: [],
     params: [],
     aliases: ["trending coins", "hot crypto", "trending tokens", "popular coins"],
     allowlisted: true,
@@ -437,14 +405,12 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/coingecko/news",
     priceUSDC: "0.008",
-    requiredParams: [],
-    optionalParams: [],
     params: [],
     aliases: ["crypto news", "bitcoin news", "blockchain news"],
     allowlisted: true,
   },
 
-  // ── MarketPulse ──────────────────────────────────────────────────────────
+  // â”€â”€ MarketPulse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "stock_metrics",
     apiId: "financial-metrics-snapshot",
@@ -454,8 +420,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/financial/financial-metrics/snapshot",
     priceUSDC: "0.0005",
-    requiredParams: ["ticker"],
-    optionalParams: [],
     params: [
       {
         name: "ticker",
@@ -477,8 +441,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/financial/news",
     priceUSDC: "0.0005",
-    requiredParams: ["ticker"],
-    optionalParams: ["limit"],
     params: [
       {
         name: "ticker",
@@ -507,8 +469,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/financial/financials",
     priceUSDC: "0.002",
-    requiredParams: ["ticker", "period"],
-    optionalParams: [],
     params: [
       {
         name: "ticker",
@@ -537,8 +497,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/financial/insider-trades",
     priceUSDC: "0.002",
-    requiredParams: ["ticker"],
-    optionalParams: [],
     params: [
       {
         name: "ticker",
@@ -560,8 +518,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/financial/filings",
     priceUSDC: "0.002",
-    requiredParams: ["ticker"],
-    optionalParams: [],
     params: [
       {
         name: "ticker",
@@ -575,7 +531,7 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     allowlisted: true,
   },
 
-  // ── Prediction Market Data ───────────────────────────────────────────────
+  // â”€â”€ Prediction Market Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     id: "polymarket_markets",
     apiId: "polymarket-markets",
@@ -585,8 +541,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/polymarket/markets",
     priceUSDC: "0.01",
-    requiredParams: [],
-    optionalParams: ["search", "slug", "status"],
     params: [
       {
         name: "search",
@@ -622,8 +576,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/polymarket/events",
     priceUSDC: "0.01",
-    requiredParams: [],
-    optionalParams: ["tag", "status"],
     params: [
       {
         name: "tag",
@@ -652,8 +604,6 @@ export const PAID_API_CATALOG: PaidApiTool[] = [
     method: "GET",
     path: "/kalshi/markets",
     priceUSDC: "0.01",
-    requiredParams: [],
-    optionalParams: ["ticker", "event_ticker", "status"],
     params: [
       {
         name: "ticker",
@@ -690,12 +640,3 @@ export function getToolById(toolId: string) {
   return PAID_API_CATALOG.find((tool) => tool.id === toolId) ?? null
 }
 
-// Verify every catalogued tool has a matching template (fails loudly at startup)
-const templateIds = new Set(API_TEMPLATES.map((t) => t.id))
-for (const tool of PAID_API_CATALOG) {
-  if (!templateIds.has(tool.apiId)) {
-    throw new Error(
-      `api-catalog: tool "${tool.id}" references template "${tool.apiId}" which is not registered in services.ts`
-    )
-  }
-}

@@ -4,7 +4,6 @@ import {
   type ProviderId,
 } from "@/lib/agent/model-registry"
 import { featherlessPlan } from "@/lib/agent/providers/featherless"
-import { geminiPlan } from "@/lib/agent/providers/gemini"
 import type { AgentPlan, AgentPlanStep, AgentProvider } from "@/lib/agent/types"
 
 function totalCost(steps: AgentPlanStep[]) {
@@ -33,7 +32,7 @@ function normalizeStep(
 }
 
 /**
- * Keyword-based fallback planner. Uses requiredParams + aliases from the
+ * Keyword-based fallback planner. Uses params + aliases from the
  * catalog to pick the right tool and extract params from the prompt.
  */
 function fallbackPlanner(
@@ -225,7 +224,6 @@ function chooseProvider(
   if (provider !== "auto") return provider
   const inferred = inferProviderFromModel(model)
   if (inferred) return inferred
-  if (process.env.GEMINI_API_KEY) return "gemini"
   if (process.env.FEATHERLESS_API_KEY) return "featherless"
   return null
 }
@@ -302,23 +300,6 @@ export async function planAgentTask(input: {
     // Rich param schema replaces the thin string arrays — AI gets descriptions + examples
     params: tool.params,
   }))
-
-  if (chosen === "gemini") {
-    const response = await geminiPlan({
-      model: input.model,
-      prompt: input.prompt,
-      availableTools,
-    })
-    if (response.ok && response.data) {
-      return normalizeProviderPlan(
-        input.prompt,
-        "gemini",
-        tools,
-        response.data,
-        input.endpointFocus
-      )
-    }
-  }
 
   if (chosen === "featherless") {
     const response = await featherlessPlan({

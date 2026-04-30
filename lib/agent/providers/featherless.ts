@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   ProviderAnswerResult,
   ProviderCallResult,
   ProviderPlanResult,
@@ -55,10 +55,9 @@ async function openAICompatChat(input: {
   prompt: string
   systemPrompt?: string
   responseFormatJson?: boolean
-  tag?: string // caller label for logs
+  tag?: string
 }) {
   const tag = input.tag ?? "openAICompatChat"
-  console.log(`[${tag}] POST ${input.baseUrl}/chat/completions model="${input.model}"`)
 
   const response = await fetch(
     `${input.baseUrl.replace(/\/$/, "")}/chat/completions`,
@@ -97,7 +96,6 @@ async function openAICompatChat(input: {
     choices?: Array<{ message?: { content?: string } }>
   }
   const content = String(payload.choices?.[0]?.message?.content || "")
-  console.log(`[${tag}] OK — content length=${content.length}`)
   return content
 }
 
@@ -125,15 +123,15 @@ export async function featherlessPlan(input: {
     "",
     "CRITICAL RULES:",
     "1. Choose the tool whose `description` and `path` best matches the user's intent.",
-    "   - Tweets/posts/timeline → use tweets tool, NOT profile tool.",
-    "   - Trending topics → use trends tool.",
+    "   - Tweets/posts/timeline ? use tweets tool, NOT profile tool.",
+    "   - Trending topics ? use trends tool.",
     "2. Build `input` using the `params` schema. Every required=true param MUST be included.",
     "   Use each param's `description` and `example` to know what value to supply.",
     "3. COINGECKO IDs: `ids` must use CoinGecko slug names, NOT ticker symbols.",
     "   WRONG: 'btc','eth','sol','xrp'. RIGHT: 'bitcoin','ethereum','solana','ripple'.",
-    "   Map: btc→bitcoin, eth→ethereum, sol→solana, xrp→ripple, doge→dogecoin, ada→cardano,",
-    "        bnb→binancecoin, avax→avalanche-2, dot→polkadot, matic→matic-network.",
-    "4. TWITTER usernames: strip @. '@elonmusk' → 'elonmusk'.",
+    "   Map: btc?bitcoin, eth?ethereum, sol?solana, xrp?ripple, doge?dogecoin, ada?cardano,",
+    "        bnb?binancecoin, avax?avalanche-2, dot?polkadot, matic?matic-network.",
+    "4. TWITTER usernames: strip @. '@elonmusk' ? 'elonmusk'.",
     "5. TWITTER woeid: default '1' (worldwide) unless location specified.",
     "6. YOUTUBE engine: always 'youtube'.",
     "7. PERPLEXITY messages: always [{\"role\":\"user\",\"content\":\"<user question>\"}].",
@@ -214,86 +212,6 @@ export async function featherlessPreamble(input: {
   }
 }
 
-/**
- * Streaming variant. Yields text chunks as the OpenAI-compatible Featherless
- * endpoint generates them via SSE.
- */
-export async function* featherlessSummarizeStream(input: {
-  model: string
-  originalPrompt: string
-  executedSteps: unknown
-}): AsyncGenerator<string, void, unknown> {
-  const apiKey = process.env.FEATHERLESS_API_KEY
-  if (!apiKey) throw new Error("FEATHERLESS_API_KEY is missing")
-
-  const model = input.model || process.env.FEATHERLESS_MODEL || "qwen3.5-plus"
-  const baseUrl =
-    process.env.FEATHERLESS_BASE_URL || "https://api.featherless.ai/v1"
-  const prompt = [
-    `The user asked: "${input.originalPrompt}"`,
-    `Here is the raw API response data: ${JSON.stringify(slimSteps(input.executedSteps))}`,
-    "",
-    "Format this into a clear, friendly, readable answer for the user.",
-    "Present key information naturally. Use bullet points or short paragraphs as appropriate.",
-    "Do NOT mention APIs, payments, infrastructure, or raw data. Just answer the user's question.",
-  ].join("\n")
-
-  const response = await fetch(
-    `${baseUrl.replace(/\/$/, "")}/chat/completions`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.2,
-        stream: true,
-        messages: [
-          { role: "system", content: "You answer concisely and clearly." },
-          { role: "user", content: prompt },
-        ],
-      }),
-    }
-  )
-
-  if (!response.ok || !response.body) {
-    throw new Error(`Featherless stream failed (${response.status})`)
-  }
-
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ""
-
-  while (true) {
-    const { value, done } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
-
-    let sepIndex
-    while ((sepIndex = buffer.indexOf("\n\n")) !== -1) {
-      const event = buffer.slice(0, sepIndex)
-      buffer = buffer.slice(sepIndex + 2)
-      for (const line of event.split("\n")) {
-        const trimmed = line.trim()
-        if (!trimmed.startsWith("data:")) continue
-        const json = trimmed.slice(5).trim()
-        if (!json || json === "[DONE]") continue
-        try {
-          const parsed = JSON.parse(json) as {
-            choices?: Array<{ delta?: { content?: string } }>
-          }
-          const delta = parsed.choices?.[0]?.delta?.content
-          if (delta) yield delta
-        } catch {
-          // Ignore malformed chunks.
-        }
-      }
-    }
-  }
-}
-
 export async function featherlessSummarize(input: {
   model: string
   originalPrompt: string
@@ -340,3 +258,5 @@ export async function featherlessSummarize(input: {
     }
   }
 }
+
+

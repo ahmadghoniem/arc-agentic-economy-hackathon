@@ -81,20 +81,6 @@ export function executeAgentPlan(input: {
   }>("/api/agent/execute-plan", input)
 }
 
-export function getFinalAnswer(input: {
-  provider: AgentPlan["provider"]
-  model: string
-  originalPrompt: string
-  executedSteps: Array<Record<string, unknown>>
-}) {
-  return request<{
-    ok: boolean
-    provider: string
-    answer: string
-    error?: string
-  }>("/api/agent/final-answer", input)
-}
-
 /**
  * Streams the final answer as plain text chunks. Yields each chunk as it
  * arrives so the UI can append tokens to a chat bubble in real time.

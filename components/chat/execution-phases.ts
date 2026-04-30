@@ -4,7 +4,7 @@
  * Pure async helpers for each phase of plan execution. Each phase owns the
  * trace updates for its step and bails out when its `isCurrent()` guard
  * returns false (run abandoned). Centralising these here keeps
- * `useDemoRunner` an orchestrator instead of a 500-line god-hook.
+ * `useAgentChatRunner` an orchestrator instead of a 500-line god-hook.
  */
 
 import type { TraceSubStep } from "@/components/chat/types"

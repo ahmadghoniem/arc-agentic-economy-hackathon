@@ -8,28 +8,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 
 function copyText(value: string) {
   if (typeof navigator !== "undefined" && navigator.clipboard) {
     void navigator.clipboard.writeText(value)
   }
-}
-
-export function StatusDot({
-  className,
-  pulse,
-}: {
-  className: string
-  pulse?: boolean
-}) {
-  return (
-    <span
-      className={cn("inline-flex size-1.5 rounded-full", className, {
-        "animate-pulse": pulse,
-      })}
-    />
-  )
 }
 
 export function CopyButton({ value, label }: { value: string; label: string }) {

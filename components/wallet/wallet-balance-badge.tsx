@@ -2,8 +2,7 @@
 
 import type { ReactNode } from "react"
 import { WalletIcon } from "@phosphor-icons/react"
-
-import { CopyButton } from "@/components/shared/shared"
+import { CopyButton } from "@/components/ui/copy-button"
 import type { WalletBalance } from "@/components/wallet/types"
 
 export function WalletBalanceBadge({

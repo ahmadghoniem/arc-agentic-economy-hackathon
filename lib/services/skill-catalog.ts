@@ -9,6 +9,7 @@ type RawSkillMetadata = {
   skill: string
   description: string
   url: string
+  suggestions: string[]
   price_range: {
     min: string
     max: string
@@ -21,6 +22,11 @@ export type SkillCatalogItem = {
   description: string
   url: string
   pricePerCall: string
+}
+
+export type ChatModelGroup = {
+  provider: string
+  models: string[]
 }
 
 const rawSkills: Array<{ id: string; metadata: RawSkillMetadata }> = [
@@ -60,3 +66,30 @@ export const skillCatalog: SkillCatalogItem[] = rawSkills.map(
     pricePerCall: metadata.price_range.min,
   })
 )
+
+export const chatEndpoints = [
+  "Auto",
+  ...rawSkills.map(({ metadata }) => metadata.skill),
+]
+
+export const fallbackModelGroups: ChatModelGroup[] = [
+  {
+    provider: "FEATHERLESS",
+    models: ["Qwen/Qwen3-8B", "Qwen/Qwen3-14B", "Qwen/Qwen3-30B-A3B"],
+  },
+]
+
+export function getSuggestionsForEndpoint(endpoint: string) {
+  const allDefaultSuggestions = rawSkills.flatMap(({ metadata }) =>
+    metadata.suggestions.slice(0, 1)
+  )
+
+  if (endpoint === "Auto") {
+    return allDefaultSuggestions
+  }
+
+  return (
+    rawSkills.find(({ metadata }) => metadata.skill === endpoint)?.metadata
+      .suggestions ?? allDefaultSuggestions
+  )
+}

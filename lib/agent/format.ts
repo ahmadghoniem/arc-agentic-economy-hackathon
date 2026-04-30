@@ -12,11 +12,9 @@ import { createId } from "@/lib/utils/id"
  * Maps a model id to its provider so the API routes know which client to use.
  * `auto` lets the server pick when we can't tell.
  */
-export function inferProvider(model: string): "auto" | "gemini" | "featherless" {
-  if (model.startsWith("gemini-")) return "gemini"
-  if (model.includes("/") || model.toLowerCase().includes("qwen"))
-    return "featherless"
-  return "auto"
+export function inferProvider(model: string): "featherless" {
+  void model
+  return "featherless"
 }
 
 /** Format a number/string USDC amount as a fixed-precision string. */

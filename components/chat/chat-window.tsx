@@ -3,14 +3,14 @@
 import * as React from "react"
 
 import { ChatComposer } from "@/components/chat/chat-composer"
-import {
-  getSuggestionsForEndpoint,
-  modelGroups as fallbackModelGroups,
-} from "@/components/chat/chat-data"
 import { ChatThread } from "@/components/chat/chat-thread"
 import { SessionTopbar } from "@/components/chat/session-topbar"
 import type { ModelGroup } from "@/components/chat/types"
-import { useDemoRunner } from "@/components/chat/use-demo-runner"
+import { useAgentChatRunner } from "@/components/chat/use-agent-chat-runner"
+import {
+  fallbackModelGroups,
+  getSuggestionsForEndpoint,
+} from "@/lib/services/skill-catalog"
 
 export function ChatWindow() {
   const [selectedModel, setSelectedModel] = React.useState(
@@ -32,7 +32,6 @@ export function ChatWindow() {
   const {
     isProcessing,
     showInitialLoader,
-    clarificationRequest,
     planRequest,
     steps,
     hasTrace,
@@ -42,19 +41,16 @@ export function ChatWindow() {
     finalAssistantMessage,
     visibleMessages,
     submitMessage,
-    submitClarification,
-    updateClarificationValue,
     confirmPlan,
     cancelPlan,
     clearChat,
-  } = useDemoRunner(selectedEndpoint, effectiveSelectedModel)
+  } = useAgentChatRunner(selectedEndpoint, effectiveSelectedModel)
 
   const suggestions = React.useMemo(
     () => getSuggestionsForEndpoint(selectedEndpoint),
     [selectedEndpoint]
   )
-  const isComposerDisabled =
-    isProcessing || Boolean(clarificationRequest) || Boolean(planRequest)
+  const isComposerDisabled = isProcessing || Boolean(planRequest)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -127,11 +123,8 @@ export function ChatWindow() {
         isProcessing={isProcessing}
         hasTrace={hasTrace}
         steps={steps}
-        clarificationRequest={clarificationRequest}
         planRequest={planRequest}
         onSuggestionSelect={handleSuggestionSelect}
-        onClarificationChange={updateClarificationValue}
-        onClarificationSubmit={submitClarification}
         onPlanConfirm={confirmPlan}
         onPlanCancel={cancelPlan}
       />

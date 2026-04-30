@@ -2,7 +2,6 @@
 
 import { PaperPlaneRightIcon } from "@phosphor-icons/react"
 
-import { endpoints } from "@/components/chat/chat-data"
 import type { ModelGroup } from "@/components/chat/types"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { chatEndpoints } from "@/lib/services/skill-catalog"
 
 type ChatComposerProps = {
   input: string
@@ -53,7 +53,7 @@ export function ChatComposer({
           onSubmit={onSubmit}
           disabled={disabled}
           maxHeight={220}
-          className="min-h-31 gap-3 rounded-3xl border-foreground/10 bg-background p-4 shadow-lg ring-0 focus-within:border-primary"
+          className="min-h-31 gap-3 rounded-3xl border-foreground/10 bg-background p-4 shadow-lg ring-0 focus-within:border-foreground/25"
         >
           <PromptInputTextarea
             placeholder="Ask anything. Your agent will find and pay the right APIs..."
@@ -81,7 +81,7 @@ export function ChatComposer({
                   align="start"
                   className="w-52 border border-divider bg-card text-foreground"
                 >
-                  {endpoints.map((endpoint) => (
+                  {chatEndpoints.map((endpoint) => (
                     <SelectItem key={endpoint} value={endpoint}>
                       {endpoint}
                     </SelectItem>

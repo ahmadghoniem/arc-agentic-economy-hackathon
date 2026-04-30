@@ -2,8 +2,11 @@
 
 import { ArrowSquareOutIcon } from "@phosphor-icons/react"
 
-import { CopyButton } from "@/components/shared/shared"
-import { formatTruncatedHash } from "@/components/activity/activity-utils"
+import { CopyButton } from "@/components/ui/copy-button"
+import {
+  formatTruncatedHash,
+  relativeTime,
+} from "@/components/activity/activity-utils"
 import {
   Tooltip,
   TooltipContent,
@@ -11,15 +14,6 @@ import {
 } from "@/components/ui/tooltip"
 import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 import { cn } from "@/lib/utils"
-
-function relativeTime(value: string) {
-  const diff = Date.now() - new Date(value).getTime()
-  const minutes = Math.max(1, Math.round(diff / 60000))
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.round(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.round(hours / 24)}d ago`
-}
 
 export function Deposits() {
   const deposits = useOmniClawStore((state) => state.activity.deposits)

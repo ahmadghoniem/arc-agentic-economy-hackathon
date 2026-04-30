@@ -1,21 +1,14 @@
-import { NextResponse } from "next/server"
-
-import { inspect, toProxyError, toProxySuccess } from "@/lib/omniclaw/client"
+import { inspect } from "@/lib/omniclaw/client"
 import { getApiTemplate } from "@/lib/omniclaw/services"
+import { proxyErrorJson, proxyJson } from "@/lib/omniclaw/proxy-response"
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}))
   const template = getApiTemplate(String(body?.apiId || ""))
 
   if (!template) {
-    return NextResponse.json(toProxyError("API template not found"), {
-      status: 404,
-    })
+    return proxyErrorJson("API template not found", 404)
   }
 
-  try {
-    return NextResponse.json(toProxySuccess(await inspect(template)))
-  } catch (error) {
-    return NextResponse.json(toProxyError(error), { status: 502 })
-  }
+  return proxyJson(() => inspect(template))
 }

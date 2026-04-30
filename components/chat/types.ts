@@ -3,21 +3,6 @@ export type ModelGroup = {
   models: string[]
 }
 
-export type SkillData = {
-  skill: string
-  label: string
-  suggestions: string[]
-}
-
-export type StepStatus = "completed" | "active" | "pending"
-
-export type ExecutionStep = {
-  id: number
-  name: string
-  detail: string
-  status: StepStatus
-}
-
 export type ChatMessage = {
   id: string
   role: "user" | "assistant"

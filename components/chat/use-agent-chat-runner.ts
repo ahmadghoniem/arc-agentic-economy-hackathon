@@ -8,10 +8,6 @@ import {
   replayPayments,
   runPolicyGuards,
 } from "@/components/chat/execution-phases"
-import {
-  createInitialSteps,
-  needsClarification,
-} from "@/components/chat/demo-data"
 import type { PlanRequest } from "@/components/chat/plan-card"
 import type { ChatMessage } from "@/components/chat/types"
 import { useTraceSteps } from "@/components/chat/use-trace-steps"
@@ -22,7 +18,6 @@ import {
   getFinalAnswerStream,
 } from "@/lib/agent/client"
 import {
-  buildPaymentProof,
   formatUSDC,
   inferProvider,
 } from "@/lib/agent/format"
@@ -42,8 +37,17 @@ export type ClarificationRequest = {
   originalPrompt: string
 }
 
+function needsClarification(prompt: string) {
+  const normalized = prompt.toLowerCase()
+  return (
+    normalized.includes("my twitter") &&
+    !normalized.includes("@") &&
+    !normalized.includes("twitter handle:")
+  )
+}
+
 /**
- * useDemoRunner
+ * useAgentChatRunner
  *
  * Thin orchestrator that wires together:
  *   - chat message state + persistence
@@ -54,7 +58,10 @@ export type ClarificationRequest = {
  * Keeps each concern small enough to follow without scrolling. Heavier
  * logic lives in the phase helpers and the agent-format utilities.
  */
-export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
+export function useAgentChatRunner(
+  selectedEndpoint: string,
+  selectedModel: string
+) {
   // ── Chat messages ──────────────────────────────────────────────────────────
   const [messages, setMessages] = React.useState<ChatMessage[]>(() =>
     loadFromStorage(CHAT_STORAGE_KEYS.messages, [])
@@ -223,19 +230,21 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
   const confirmPlan = React.useCallback(async () => {
     if (!planRequest || isProcessing) return
 
+    const confirmedPlan = planRequest
     const { patch, isCurrent } = withRun()
 
     setIsProcessing(true)
+    setPlanRequest(null)
     patch(2, { status: "completed", subtitle: "User confirmed execution." })
 
     // Fire the real execute call immediately; animate inspect previews while
     // it's in flight.
     const executionPromise = executeAgentPlan({
-      plan: planRequest.plan,
+      plan: confirmedPlan.plan,
       confirmed: true,
     })
     await animateInspectPreview({
-      plan: planRequest.plan,
+      plan: confirmedPlan.plan,
       patch,
       isCurrent,
     })
@@ -311,9 +320,9 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     let streamed = ""
     try {
       const stream = getFinalAnswerStream({
-        provider: planRequest.plan.provider,
-        model: planRequest.model,
-        originalPrompt: planRequest.plan.originalPrompt,
+        provider: confirmedPlan.plan.provider,
+        model: confirmedPlan.model,
+        originalPrompt: confirmedPlan.plan.originalPrompt,
         executedSteps: execution.steps,
       })
       for await (const chunk of stream) {
@@ -334,9 +343,9 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
 
     if (!isCurrent()) return
 
-    // Append the payment receipt now that streaming has finished.
-    const paymentProof = buildPaymentProof(execution.steps)
-    const answer = `${streamed}\n\nTotal paid: ${formatUSDC(execution.totalPaidUSDC)}.\n\nPayment proof:\n${paymentProof}`
+    const answer =
+      streamed ||
+      "I couldn't generate the final provider summary, but OmniClaw returned the execution result."
     setMessages((curr) =>
       curr.map((m) => (m.id === answerId ? { ...m, content: answer } : m))
     )
@@ -345,7 +354,6 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
       status: "completed",
       subtitle: `Total spent: ${formatUSDC(execution.totalPaidUSDC)} — ${allPaySubs.length} endpoint(s) called.`,
     })
-    setPlanRequest(null)
     setIsProcessing(false)
   }, [isProcessing, planRequest, policy, withRun])
 
@@ -426,6 +434,3 @@ export function useDemoRunner(selectedEndpoint: string, selectedModel: string) {
     clearChat,
   }
 }
-
-// Re-export createInitialSteps for any consumers that imported it transitively.
-export { createInitialSteps }

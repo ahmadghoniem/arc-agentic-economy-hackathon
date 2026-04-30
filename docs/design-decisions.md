@@ -330,6 +330,42 @@ The chat surface now exposes the active task and current spend/API usage context
 
 Verify the header appears above the chat scroll area without layout overlap.
 
+### 2026-04-30 - Split OmniClaw Store Into Slices
+
+- Type: Refactored
+- Scope: Architecture
+- Related Decision: N/A
+
+#### Summary
+
+Split the OmniClaw Zustand store into internal connection, account, activity, and execution slices while keeping the public `useOmniClawStore` hook stable.
+
+#### Impact
+
+Store behavior and component selectors are preserved, while normalization, formatting, API fetch helpers, and service template lookup now live outside the store entry file.
+
+#### Verification
+
+Run `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
+### 2026-04-30 - Simplify Shared App Code
+
+- Type: Refactored
+- Scope: Architecture, UI
+- Related Decision: N/A
+
+#### Summary
+
+Removed unused agent/provider code, derived OmniClaw service templates from the paid API catalog, shared proxy route response handling, centralized activity time formatting, and trimmed unused loader variants.
+
+#### Impact
+
+The app keeps the same public UI and API behavior with less duplicate metadata, fewer route wrappers, and less unused client/provider code.
+
+#### Verification
+
+Run `pnpm typecheck`, `pnpm lint`, and `pnpm build`.
+
 ## References
 
 - MADR: https://adr.github.io/madr/

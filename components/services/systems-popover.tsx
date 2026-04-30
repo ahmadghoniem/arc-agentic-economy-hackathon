@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { StatusDot } from "@/components/shared/shared"
+import { StatusDot } from "@/components/ui/status-dot"
 import { useOmniClawStore } from "@/lib/stores/omniclaw-store"
 
 export function SystemsPopover() {

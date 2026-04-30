@@ -12,7 +12,7 @@ export type ProviderPlanResult = {
 
 export type ProviderCallResult = {
   ok: boolean
-  provider: "gemini" | "featherless"
+  provider: "featherless"
   data?: ProviderPlanResult
   error?: string
 }

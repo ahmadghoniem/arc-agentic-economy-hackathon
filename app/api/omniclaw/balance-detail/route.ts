@@ -1,15 +1,6 @@
-import { NextResponse } from "next/server"
-
-import {
-  getBalanceDetail,
-  toProxyError,
-  toProxySuccess,
-} from "@/lib/omniclaw/client"
+import { getBalanceDetail } from "@/lib/omniclaw/client"
+import { proxyJson } from "@/lib/omniclaw/proxy-response"
 
 export async function GET() {
-  try {
-    return NextResponse.json(toProxySuccess(await getBalanceDetail()))
-  } catch (error) {
-    return NextResponse.json(toProxyError(error), { status: 502 })
-  }
+  return proxyJson(getBalanceDetail)
 }

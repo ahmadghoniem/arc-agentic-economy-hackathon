@@ -1,18 +1,13 @@
-import { NextResponse } from "next/server"
-
-import { toProxyError, toProxySuccess, withdraw } from "@/lib/omniclaw/client"
+import { withdraw } from "@/lib/omniclaw/client"
+import { proxyErrorJson, proxyJson } from "@/lib/omniclaw/proxy-response"
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}))
   const amount = String(body?.amount || "")
 
   if (!amount) {
-    return NextResponse.json(toProxyError("amount is required"), { status: 400 })
+    return proxyErrorJson("amount is required", 400)
   }
 
-  try {
-    return NextResponse.json(toProxySuccess(await withdraw(amount)))
-  } catch (error) {
-    return NextResponse.json(toProxyError(error), { status: 502 })
-  }
+  return proxyJson(() => withdraw(amount))
 }

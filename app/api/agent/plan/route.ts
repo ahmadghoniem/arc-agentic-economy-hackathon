@@ -5,7 +5,7 @@ import { planAgentTask } from "@/lib/agent/ai-planner"
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
-      provider?: "auto" | "gemini" | "featherless"
+      provider?: "auto" | "featherless"
       model?: string
       prompt?: string
       endpointFocus?: string

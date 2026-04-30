@@ -1,4 +1,4 @@
-export type ProviderId = "gemini" | "featherless"
+export type ProviderId = "featherless"
 
 export type ModelRegistryEntry = {
   provider: ProviderId
@@ -17,28 +17,13 @@ function parseModelList(value: string | undefined, fallback: string[]) {
 }
 
 export function getModelRegistry(): ModelRegistryEntry[] {
-  const geminiModels = parseModelList(process.env.GEMINI_MODEL, [
-    "gemini-2.5-flash-lite",
-    "gemini-2.5-flash",
-  ])
   const featherlessModels = parseModelList(process.env.FEATHERLESS_MODEL, [
     "Qwen/Qwen3-8B",
     "Qwen/Qwen3-14B",
     "Qwen/Qwen3-30B-A3B",
-    "mistralai/Mistral-Nemo-Instruct-2407",
   ])
 
   const registry: ModelRegistryEntry[] = []
-
-  for (const model of geminiModels) {
-    registry.push({
-      provider: "gemini",
-      id: model,
-      label: model,
-      enabled: Boolean(process.env.GEMINI_API_KEY),
-      requiresEnv: "GEMINI_API_KEY",
-    })
-  }
 
   for (const model of featherlessModels) {
     registry.push({
@@ -60,7 +45,6 @@ export function inferProviderFromModel(model: string): ProviderId | null {
 
 export function getProviderAvailability() {
   return {
-    gemini: Boolean(process.env.GEMINI_API_KEY),
     featherless: Boolean(process.env.FEATHERLESS_API_KEY),
   }
 }

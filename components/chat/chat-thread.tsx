@@ -1,8 +1,6 @@
 "use client"
 
 import type { ChatMessage, TraceStep } from "@/components/chat/types"
-import type { ClarificationRequest } from "@/components/chat/use-demo-runner"
-import { ClarificationCard } from "@/components/chat/clarification-card"
 import { AgentExecutionTrace } from "@/components/chat/execution-trace"
 import { PlanCard, type PlanRequest } from "@/components/chat/plan-card"
 import {
@@ -31,11 +29,8 @@ type ChatThreadProps = {
   isProcessing: boolean
   hasTrace: boolean
   steps: TraceStep[]
-  clarificationRequest: ClarificationRequest | null
   planRequest: PlanRequest | null
   onSuggestionSelect: (suggestion: string) => void
-  onClarificationChange: (value: string) => void
-  onClarificationSubmit: () => void
   onPlanConfirm: () => void
   onPlanCancel: () => void
 }
@@ -85,11 +80,8 @@ export function ChatThread({
   isProcessing,
   hasTrace,
   steps,
-  clarificationRequest,
   planRequest,
   onSuggestionSelect,
-  onClarificationChange,
-  onClarificationSubmit,
   onPlanConfirm,
   onPlanCancel,
 }: ChatThreadProps) {
@@ -103,7 +95,7 @@ export function ChatThread({
                 What should OmniClaw route?
               </h3>
               <p className="mt-2 max-w-xl text-muted-foreground">
-                Pick a suggestion or enter a request. The demo will inspect
+                Pick a suggestion or enter a request. OmniClaw will inspect
                 costs, run guards, and show paid API responses as JSON.
               </p>
             </div>
@@ -146,16 +138,6 @@ export function ChatThread({
 
         {finalAssistantMessage && finalAssistantMessage.content.trim() ? (
           <ChatBubble message={finalAssistantMessage} />
-        ) : null}
-
-        {clarificationRequest ? (
-          <div className="flex justify-start">
-            <ClarificationCard
-              request={clarificationRequest}
-              onValueChange={onClarificationChange}
-              onSubmit={onClarificationSubmit}
-            />
-          </div>
         ) : null}
 
         {planRequest ? (

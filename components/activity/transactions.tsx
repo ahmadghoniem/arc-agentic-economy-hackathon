@@ -13,7 +13,8 @@ export function Transactions() {
     (state) => state.activity.payments.length
   )
   const depositCount = useOmniClawStore(
-    (state) => state.activity.deposits.length + state.activity.explorerDeposits.length
+    (state) =>
+      state.activity.deposits.length + state.activity.explorerDeposits.length
   )
   const withdrawalCount = useOmniClawStore(
     (state) => state.activity.withdrawals.length
@@ -31,21 +32,30 @@ export function Transactions() {
         className="min-h-0 flex-1 gap-1 overflow-hidden"
       >
         <TabsList variant="line" className="w-full justify-between gap-1">
-          <TabsTrigger value="payments" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="payments" className="gap-1 px-1 text-xs">
             Payments
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[0.625rem] leading-none"
+            >
               {paymentCount}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="deposits" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="deposits" className="gap-1 px-1 text-xs">
             Deposits
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[0.625rem] leading-none"
+            >
               {depositCount}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="withdrawals" className="text-[11px] gap-1 px-1">
+          <TabsTrigger value="withdrawals" className="gap-1 px-1 text-xs">
             Withdrawals
-            <Badge variant="outline" className="ml-1 h-4 px-1 text-[9px] leading-none">
+            <Badge
+              variant="outline"
+              className="ml-1 h-4 px-1 text-[0.625rem] leading-none"
+            >
               {withdrawalCount}
             </Badge>
           </TabsTrigger>

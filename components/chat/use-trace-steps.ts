@@ -2,13 +2,31 @@
 
 import * as React from "react"
 
-import { createInitialSteps } from "@/components/chat/demo-data"
 import type { TraceStep } from "@/components/chat/types"
 import {
   CHAT_STORAGE_KEYS,
   loadFromStorage,
   saveToStorage,
 } from "@/lib/storage/chat-storage"
+
+const TRACE_TITLES = [
+  "Reviewing your request",
+  "Checking API endpoints",
+  "Calculating transaction estimates",
+  "Running payment guards",
+  "Executing payments",
+  "Completed",
+]
+
+const createInitialSteps = (): TraceStep[] =>
+  TRACE_TITLES.map((title, index) => ({
+    id: index + 1,
+    title,
+    subtitle: "",
+    activityLog: [],
+    status: "pending",
+    subSteps: index + 1 === 3 || index + 1 === 5 ? [] : undefined,
+  }))
 
 /**
  * Applies a patch to the matching step. When the subtitle changes we also

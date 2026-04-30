@@ -1,4 +1,4 @@
-export type AgentProvider = "gemini" | "featherless" | "fallback"
+export type AgentProvider = "featherless" | "fallback"
 
 export type AgentPlanStep = {
   id: string

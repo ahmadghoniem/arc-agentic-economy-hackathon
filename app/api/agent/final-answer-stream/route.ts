@@ -1,20 +1,12 @@
 /**
  * /api/agent/final-answer-stream
  *
- * Returns the final answer as a streamed plain-text response.
- *
- * Strategy: use the same non-streaming featherlessSummarize() that the
- * preamble uses (via openAICompatChat) — it's proven to work. Once we have
- * the full text we emit it as a single chunk so the client still gets a
- * ReadableStream and the existing streaming consumer in use-demo-runner works
- * without any changes.
- *
- * Gemini is kept as a secondary fallback if Featherless fails.
+ * Returns the final answer as a streamed plain-text response. Featherless is
+ * the only AI provider; provider failures return a deterministic text fallback.
  */
 export const runtime = "nodejs"
 
 import { featherlessSummarize } from "@/lib/agent/providers/featherless"
-import { geminiSummarize } from "@/lib/agent/providers/gemini"
 
 type ExecutedStep = Record<string, unknown>
 
@@ -57,16 +49,8 @@ export async function POST(request: Request) {
     return new Response("originalPrompt is required", { status: 400 })
   }
 
-  // Resolve a single Featherless model ID — never read FEATHERLESS_MODEL from
-  // env here, that var holds a comma-separated list for the registry dropdown.
-  const featherlessModel =
-    model && !model.startsWith("gemini-") ? model : "Qwen/Qwen3-8B"
+  const featherlessModel = model || "Qwen/Qwen3-8B"
 
-  console.log(
-    `[final-answer-stream] model="${model}" → featherlessModel="${featherlessModel}"`
-  )
-
-  // ── Try Featherless (same path as preamble — proven to work) ──────────────
   const featherlessResult = await featherlessSummarize({
     model: featherlessModel,
     originalPrompt,
@@ -77,7 +61,6 @@ export async function POST(request: Request) {
   })
 
   if (featherlessResult.ok && featherlessResult.text) {
-    console.log("[final-answer-stream] Featherless succeeded")
     return new Response(textStream(featherlessResult.text), {
       headers: RESPONSE_HEADERS,
     })
@@ -87,31 +70,9 @@ export async function POST(request: Request) {
     featherlessResult.error
   )
 
-  // ── Gemini fallback ───────────────────────────────────────────────────────
-  const geminiResult = await geminiSummarize({
-    model: "gemini-2.0-flash-lite",
-    originalPrompt,
-    executedSteps,
-  }).catch((err) => {
-    console.error("[final-answer-stream] geminiSummarize threw:", err)
-    return { ok: false as const, error: String(err) }
-  })
-
-  if (geminiResult.ok && geminiResult.text) {
-    console.log("[final-answer-stream] Gemini fallback succeeded")
-    return new Response(textStream(geminiResult.text), {
-      headers: RESPONSE_HEADERS,
-    })
-  }
-  console.error(
-    "[final-answer-stream] Gemini fallback failed:",
-    geminiResult.error
-  )
-
-  // ── Last resort ───────────────────────────────────────────────────────────
   const fallbackText =
     executedSteps.length > 0
-      ? "I retrieved data for your request but couldn't format it with the AI model right now. Please try again."
+      ? "I retrieved data for your request but couldn't format it with Featherless right now. Please try again."
       : "No data was returned for your request."
 
   return new Response(textStream(fallbackText), { headers: RESPONSE_HEADERS })

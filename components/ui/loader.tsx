@@ -1,23 +1,12 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import React from "react"
+
+type LoaderSize = "sm" | "md" | "lg"
 
 export interface LoaderProps {
-  variant?:
-    | "circular"
-    | "classic"
-    | "pulse"
-    | "pulse-dot"
-    | "dots"
-    | "typing"
-    | "wave"
-    | "bars"
-    | "terminal"
-    | "text-blink"
-    | "text-shimmer"
-    | "loading-dots"
-  size?: "sm" | "md" | "lg"
+  variant?: "circular" | "text-shimmer"
+  size?: LoaderSize
   text?: string
   className?: string
 }
@@ -27,7 +16,7 @@ export function CircularLoader({
   size = "md",
 }: {
   className?: string
-  size?: "sm" | "md" | "lg"
+  size?: LoaderSize
 }) {
   const sizeClasses = {
     sm: "size-4",
@@ -48,351 +37,6 @@ export function CircularLoader({
   )
 }
 
-export function ClassicLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const sizeClasses = {
-    sm: "size-4",
-    md: "size-5",
-    lg: "size-6",
-  }
-
-  const barSizes = {
-    sm: { height: "6px", width: "1.5px" },
-    md: { height: "8px", width: "2px" },
-    lg: { height: "10px", width: "2.5px" },
-  }
-
-  return (
-    <div className={cn("relative", sizeClasses[size], className)}>
-      <div className="absolute h-full w-full">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-spinner-fade rounded-full bg-primary"
-            style={{
-              top: "0",
-              left: "50%",
-              marginLeft:
-                size === "sm" ? "-0.75px" : size === "lg" ? "-1.25px" : "-1px",
-              transformOrigin: `${size === "sm" ? "0.75px" : size === "lg" ? "1.25px" : "1px"} ${size === "sm" ? "10px" : size === "lg" ? "14px" : "12px"}`,
-              transform: `rotate(${i * 30}deg)`,
-              opacity: 0,
-              animationDelay: `${i * 0.1}s`,
-              height: barSizes[size].height,
-              width: barSizes[size].width,
-            }}
-          />
-        ))}
-      </div>
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function PulseLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const sizeClasses = {
-    sm: "size-4",
-    md: "size-5",
-    lg: "size-6",
-  }
-
-  return (
-    <div className={cn("relative", sizeClasses[size], className)}>
-      <div className="absolute inset-0 animate-thin-pulse rounded-full border-2 border-primary" />
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function PulseDotLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const sizeClasses = {
-    sm: "size-1",
-    md: "size-2",
-    lg: "size-3",
-  }
-
-  return (
-    <div
-      className={cn(
-        "animate-pulse-dot rounded-full bg-primary",
-        sizeClasses[size],
-        className
-      )}
-    >
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function DotsLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const dotSizes = {
-    sm: "h-1.5 w-1.5",
-    md: "h-2 w-2",
-    lg: "h-2.5 w-2.5",
-  }
-
-  const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
-    lg: "h-6",
-  }
-
-  return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className
-      )}
-    >
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className={cn(
-            "animate-bounce-dots rounded-full bg-primary",
-            dotSizes[size]
-          )}
-          style={{
-            animationDelay: `${i * 160}ms`,
-          }}
-        />
-      ))}
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function TypingLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const dotSizes = {
-    sm: "h-1 w-1",
-    md: "h-1.5 w-1.5",
-    lg: "h-2 w-2",
-  }
-
-  const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
-    lg: "h-6",
-  }
-
-  return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className
-      )}
-    >
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className={cn(
-            "animate-typing rounded-full bg-primary",
-            dotSizes[size]
-          )}
-          style={{
-            animationDelay: `${i * 250}ms`,
-          }}
-        />
-      ))}
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function WaveLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const barWidths = {
-    sm: "w-0.5",
-    md: "w-0.5",
-    lg: "w-1",
-  }
-
-  const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
-    lg: "h-6",
-  }
-
-  const heights = {
-    sm: ["6px", "9px", "12px", "9px", "6px"],
-    md: ["8px", "12px", "16px", "12px", "8px"],
-    lg: ["10px", "15px", "20px", "15px", "10px"],
-  }
-
-  return (
-    <div
-      className={cn(
-        "flex items-center gap-0.5",
-        containerSizes[size],
-        className
-      )}
-    >
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className={cn(
-            "animate-wave rounded-full bg-primary",
-            barWidths[size]
-          )}
-          style={{
-            animationDelay: `${i * 100}ms`,
-            height: heights[size][i],
-          }}
-        />
-      ))}
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function BarsLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const barWidths = {
-    sm: "w-1",
-    md: "w-1.5",
-    lg: "w-2",
-  }
-
-  const containerSizes = {
-    sm: "h-4 gap-1",
-    md: "h-5 gap-1.5",
-    lg: "h-6 gap-2",
-  }
-
-  return (
-    <div className={cn("flex", containerSizes[size], className)}>
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className={cn(
-            "animate-wave-bars h-full bg-primary",
-            barWidths[size]
-          )}
-          style={{
-            animationDelay: `${i * 0.2}s`,
-          }}
-        />
-      ))}
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function TerminalLoader({
-  className,
-  size = "md",
-}: {
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const cursorSizes = {
-    sm: "h-3 w-1.5",
-    md: "h-4 w-2",
-    lg: "h-5 w-2.5",
-  }
-
-  const textSizes = {
-    sm: "text-sm",
-    md: "",
-    lg: "text-base",
-  }
-
-  const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
-    lg: "h-6",
-  }
-
-  return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className
-      )}
-    >
-      <span className={cn("font-mono text-primary", textSizes[size])}>
-        {">"}
-      </span>
-      <div
-        className={cn(
-          "animate-[blink_1s_step-end_infinite] bg-primary",
-          cursorSizes[size]
-        )}
-      />
-      <span className="sr-only">Loading</span>
-    </div>
-  )
-}
-
-export function TextBlinkLoader({
-  text = "Thinking",
-  className,
-  size = "md",
-}: {
-  text?: string
-  className?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const textSizes = {
-    sm: "text-sm",
-    md: "",
-    lg: "text-base",
-  }
-
-  return (
-    <div
-      className={cn(
-        "animate-text-blink font-medium",
-        textSizes[size],
-        className
-      )}
-    >
-      {text}
-    </div>
-  )
-}
-
 export function TextShimmerLoader({
   text = "Thinking",
   className,
@@ -400,7 +44,7 @@ export function TextShimmerLoader({
 }: {
   text?: string
   className?: string
-  size?: "sm" | "md" | "lg"
+  size?: LoaderSize
 }) {
   const textSizes = {
     sm: "text-sm",
@@ -423,75 +67,17 @@ export function TextShimmerLoader({
   )
 }
 
-export function TextDotsLoader({
-  className,
-  text = "Thinking",
-  size = "md",
-}: {
-  className?: string
-  text?: string
-  size?: "sm" | "md" | "lg"
-}) {
-  const textSizes = {
-    sm: "text-sm",
-    md: "",
-    lg: "text-base",
-  }
-
-  return (
-    <div className={cn("inline-flex items-center", className)}>
-      <span className={cn("font-medium text-primary", textSizes[size])}>
-        {text}
-      </span>
-      <span className="inline-flex">
-        <span className="animate-[loading-dots_1.4s_infinite_0.2s] text-primary">
-          .
-        </span>
-        <span className="animate-[loading-dots_1.4s_infinite_0.4s] text-primary">
-          .
-        </span>
-        <span className="animate-[loading-dots_1.4s_infinite_0.6s] text-primary">
-          .
-        </span>
-      </span>
-    </div>
-  )
-}
-
 function Loader({
   variant = "circular",
   size = "md",
   text,
   className,
 }: LoaderProps) {
-  switch (variant) {
-    case "circular":
-      return <CircularLoader size={size} className={className} />
-    case "classic":
-      return <ClassicLoader size={size} className={className} />
-    case "pulse":
-      return <PulseLoader size={size} className={className} />
-    case "pulse-dot":
-      return <PulseDotLoader size={size} className={className} />
-    case "dots":
-      return <DotsLoader size={size} className={className} />
-    case "typing":
-      return <TypingLoader size={size} className={className} />
-    case "wave":
-      return <WaveLoader size={size} className={className} />
-    case "bars":
-      return <BarsLoader size={size} className={className} />
-    case "terminal":
-      return <TerminalLoader size={size} className={className} />
-    case "text-blink":
-      return <TextBlinkLoader text={text} size={size} className={className} />
-    case "text-shimmer":
-      return <TextShimmerLoader text={text} size={size} className={className} />
-    case "loading-dots":
-      return <TextDotsLoader text={text} size={size} className={className} />
-    default:
-      return <CircularLoader size={size} className={className} />
+  if (variant === "text-shimmer") {
+    return <TextShimmerLoader text={text} size={size} className={className} />
   }
+
+  return <CircularLoader size={size} className={className} />
 }
 
 export { Loader }
