@@ -1,5 +1,4 @@
 # 🦀 OmniClaw Console
-
 > **AI-Powered Payment Routing Console on Arc Testnet**
 >
 > An intelligent agent console that plans API workflows using multi-provider AI, executes real USDC payments through Circle W3S programmable wallets, and records every transaction on-chain with verifiable ArcScan proofs.
