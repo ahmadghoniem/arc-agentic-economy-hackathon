@@ -1,10 +1,9 @@
 # OmniClaw Console
 
 A Next.js workspace for **agent-driven, pay-per-call API workflows** on Arc. Plan paid API requests in chat, review cost and tools before spending, execute x402-style payments through OmniClaw, and monitor wallet balances, policy guards, and on-chain activity in one dark console UI.
+Built for the **[Agentic Economy on Arc](https://lablab.ai/ai-hackathons/nano-payments-arc)** hackathon by [lablab.ai](https://lablab.ai) and Circle — demonstrating how Circle Nanopayments and Arc make sub-cent, high-frequency USDC transactions economically viable for APIs and AI agents.
 
 <img width="1905" height="948" alt="Screenshot 2026-04-26 025833" src="https://github.com/user-attachments/assets/1175e4e0-87f6-494d-8e49-c7c63e9d4f40" />
-
-Built for the **[Agentic Economy on Arc](https://lablab.ai/ai-hackathons/nano-payments-arc)** hackathon by [lablab.ai](https://lablab.ai) and Circle — demonstrating how Circle Nanopayments and Arc make sub-cent, high-frequency USDC transactions economically viable for APIs and AI agents.
 
 ## Hackathon context
 
