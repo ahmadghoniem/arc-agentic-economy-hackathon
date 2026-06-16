@@ -1,26 +1,160 @@
 # OmniClaw Console
 
-OmniClaw Console is a Next.js agent-payment workspace for planning paid API workflows, reviewing the plan with a user, executing x402-style payments through OmniClaw, and showing wallet/activity state in one interface.
+A Next.js workspace for **agent-driven, pay-per-call API workflows** on Arc. Plan paid API requests in chat, review cost and tools before spending, execute x402-style payments through OmniClaw, and monitor wallet balances, policy guards, and on-chain activity in one dark console UI.
 
-The app combines:
+Built for the **[Agentic Economy on Arc](https://lablab.ai/ai-hackathons/nano-payments-arc)** hackathon by [lablab.ai](https://lablab.ai) and Circle — demonstrating how Circle Nanopayments and Arc make sub-cent, high-frequency USDC transactions economically viable for APIs and AI agents.
 
-- A chat-first agent flow for planning and executing paid API calls.
-- AI provider routing for Gemini, Featherless, and AIVML.
-- OmniClaw proxy routes for wallet health, balances, deposits, withdrawals, inspect, pay, and activity.
-- A dark console UI with chat, execution trace, active guards, service catalog, wallet balances, and gateway activity.
-- Arc/Circle-oriented unit economics and transaction proof surfaces.
+## Hackathon context
 
-## Current Product Flow
+| | |
+| --- | --- |
+| **Event** | [Agentic Economy on Arc](https://lablab.ai/ai-hackathons/nano-payments-arc) (lablab.ai × Circle) |
+| **Challenge** | Build the agentic economy on Arc using programmable USDC and Nanopayments |
+| **Settlement** | Arc testnet — USDC as native gas and stablecoin |
+| **Payments** | Circle Gateway Nanopayments + x402 inspect/pay |
+| **Data APIs** | [AIsa](https://aisa.one) pay-per-call skills (Twitter, crypto, search, and more) |
 
-1. The user asks for a task in the chat composer.
-2. The assistant sends a short acknowledgement while planning starts.
+### Track alignment
+
+This project maps to several hackathon tracks:
+
+| Track | How OmniClaw Console addresses it |
+| --- | --- |
+| **Per-API monetization** | Each allowlisted tool charges per request in USDC (e.g. $0.00044/call) via x402. |
+| **Consumer AI payments** | An AI assistant plans and executes payments on the user's behalf, with explicit plan review and confirmation before any spend. |
+| **Usage-based billing** | Pricing aligns to actual API usage — per query, per endpoint — with real-time settlement through OmniClaw. |
+| **Agent-to-agent commerce** | Autonomous planner agents select and pay for data services without batching or subscription lock-in. |
+
+### Economic proof
+
+The hackathon requires more than a demo — submissions must show viable micropayment economics. This console surfaces that directly:
+
+- **Sub-cent pricing** — catalog tools price at ≤ $0.01 per action (most calls are fractions of a cent).
+- **High-frequency settlement** — each confirmed plan can trigger many on-chain inspect/pay transactions in a single session.
+- **Margin explanation** — the unit economics panel compares Base/Solana gas costs against gateway micropayment costs, showing why traditional per-tx gas would break this model.
+
+Circle describes the core idea: *the internet made information programmable; Circle Nanopayments + Arc make value programmable — and economically viable at high frequency.*
+
+## What it does
+
+| You get | How |
+| --- | --- |
+| **Chat-first planning** | Natural-language prompts map to allowlisted paid API tools with estimated USDC cost. |
+| **Explicit confirmation** | No payment runs until you approve the generated plan. |
+| **x402 inspect → pay** | Each call is inspected, policy-checked, and paid through OmniClaw server routes. |
+| **Live execution trace** | Inspect, guard, and payment steps replay in the UI as they happen. |
+| **Wallet + activity** | EOA, Circle, and Gateway balances; deposits, withdrawals, and ArcScan links. |
+| **Unit economics** | Base and Solana gas estimates compared against gateway micropayment costs. |
+
+## Quick start
+
+**Prerequisites:** [Node.js](https://nodejs.org/) 20+, [pnpm](https://pnpm.io/), a running OmniClaw backend/API stack, and at least one AI provider API key (or rely on the built-in fallback planner for supported prompts).
+
+```powershell
+pnpm install
+# Create .env.local — see Environment section below
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+Production checks:
+
+```powershell
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
+## Example prompts
+
+Try these once OmniClaw and your AI provider are configured:
+
+- *Get the latest tweets from @elonmusk.*
+- *What is the current price of ETH?*
+- *Search YouTube for "Arc blockchain tutorial".*
+- *What are the top trending topics on Twitter right now?*
+- *Show me Polymarket odds for the next US election.*
+
+Prompt suggestions also appear in the service catalog sidebar.
+
+## Product flow
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Chat as Chat UI
+  participant Planner as /api/agent/plan
+  participant Executor as /api/agent/execute-plan
+  participant OmniClaw as /api/omniclaw/*
+  participant APIs as Paid APIs
+
+  User->>Chat: Ask a task
+  Chat->>Planner: Generate plan (tools + cost)
+  Planner-->>Chat: Plan card
+  User->>Chat: Confirm plan
+  Chat->>Executor: Execute confirmed steps
+  loop Each tool
+    Executor->>OmniClaw: inspect
+    Executor->>OmniClaw: policy guards
+    Executor->>OmniClaw: pay
+    OmniClaw->>APIs: Paid request
+    APIs-->>OmniClaw: Response
+  end
+  Executor-->>Chat: Results + trace
+  Chat->>User: Streamed final answer
+```
+
+1. User sends a task in the chat composer.
+2. A short acknowledgement posts while planning starts.
 3. The planner maps the request to allowlisted paid API tools.
-4. The plan card shows the selected tools, estimated cost, and reasons.
-5. The user confirms before any payment is executed.
+4. The plan card shows selected tools, estimated cost, and reasons.
+5. The user confirms — **no payment executes before this step**.
 6. The execution route inspects each endpoint, runs policy checks, pays through OmniClaw, and captures responses.
-7. The execution trace replays inspect, guard, and payment steps in the UI.
-8. The final answer is generated from the executed API responses.
-9. Wallet balances and activity panels can be refreshed from the header.
+7. The execution trace replays inspect, guard, and payment steps in real time.
+8. A final answer is streamed from the executed API responses.
+9. Wallet balances and activity panels refresh from the header.
+
+## Console layout
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Header — model selector, wallet balances, deposit/withdraw     │
+├──────────────┬──────────────────────────────┬───────────────────┤
+│ Left sidebar │         Chat window          │  Right sidebar    │
+│              │  thread · plan card · trace  │  service catalog  │
+│ Active guards│                              │  + prompt ideas   │
+│ Unit econ.   │                              │                   │
+│ Transactions │                              │                   │
+└──────────────┴──────────────────────────────┴───────────────────┘
+```
+
+## Integrated skills
+
+Six seller skill categories drive the service catalog and planner metadata. **22 allowlisted tools** are active in the execution catalog (`lib/agent/api-catalog.ts`).
+
+| Skill | Domain |
+| --- | --- |
+| Twitter Autopilot | Profiles, tweets, trends, communities |
+| Multi-Source Search | Web and news search |
+| YouTube SERP | Video search and metadata |
+| Crypto Market Data | Prices, tickers, market snapshots |
+| MarketPulse | Financial statements and market data |
+| Prediction Market Data | Polymarket and prediction-market odds |
+
+Full endpoint metadata lives in `agent-skills/*/data.json`. Visible categories and prompt suggestions are loaded via `lib/services/skill-catalog.ts`.
+
+## Tech stack
+
+| Layer | Choices |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Turbopack dev) |
+| UI | React 19, Tailwind CSS 4, Base UI, shadcn-style primitives |
+| State | Zustand (`lib/stores/omniclaw-store.ts`) |
+| AI routing | Gemini, Featherless, AIVML with fallback keyword matching |
+| Payments | OmniClaw proxy + Circle Gateway Nanopayments (x402 inspect/pay) |
+| Chain | Arc testnet — USDC settlement, Circle Wallets, ArcScan explorer |
+| Data | AIsa pay-per-call API skills via `agent-skills/` metadata |
 
 ## Architecture
 
@@ -39,7 +173,7 @@ UI surfaces
   components/economics     Per-call unit economics
 
 Agent layer
-  lib/agent/api-catalog.ts       Paid API tool catalog
+  lib/agent/api-catalog.ts       Paid API tool catalog (allowlist)
   lib/agent/ai-planner.ts        Provider + fallback planning logic
   lib/agent/model-registry.ts    Provider/model availability
   lib/agent/providers/*          Gemini, Featherless, AIVML adapters
@@ -47,25 +181,12 @@ Agent layer
 
 OmniClaw layer
   lib/omniclaw/client.ts         OmniClaw API client
-  lib/omniclaw/services.ts       Paid endpoint templates
+  lib/omniclaw/services.ts         Paid endpoint templates
   app/api/omniclaw/*             Next.js proxy routes
   lib/stores/omniclaw-store.ts   Client-side wallet/activity/execution state
 ```
 
-## Key Features
-
-| Feature | Current behavior |
-| --- | --- |
-| Agent planning | Routes prompts to allowlisted paid API tools using provider planning plus fallback matching. |
-| User confirmation | No paid workflow executes until the user confirms the generated plan. |
-| x402 inspect/pay | Server routes call OmniClaw inspect and pay endpoints for each selected API. |
-| Wallet controls | Header displays EOA, Circle, and Gateway balances, with deposit/withdraw controls. |
-| Policy guards | Active guard panel reflects wallet policy and execution guard results. |
-| Activity feed | Payments, deposits, withdrawals, transaction ids, and ArcScan links are surfaced in the console. |
-| Service catalog | Skill metadata from `agent-skills/*/data.json` drives visible service categories and prompt suggestions. |
-| Unit economics | Base/Solana gas estimates are compared against gateway-style micropayment economics. |
-
-## Project Structure
+## Project structure
 
 ```text
 app/
@@ -82,15 +203,15 @@ app/
     omniclaw/
       health/              GET OmniClaw health
       address/             GET wallet addresses
-      balance/             GET normalized backend balance
       balance-detail/      GET detailed wallet/gateway balances
-      config-status/       GET backend configuration status
+      wallets/             GET wallet list
       deposit/             POST gateway deposit
       withdraw/            POST gateway withdrawal
       inspect/             POST payable endpoint inspect
       pay/                 POST paid endpoint execution
       transactions/        GET recent transaction activity
       explorer/            GET ArcScan-derived snapshot
+agent-skills/              Per-skill metadata and prompt suggestions
 components/
   activity/                Gateway activity panels
   chat/                    Chat window, composer, plan card, trace
@@ -108,26 +229,26 @@ lib/
   storage/                 Chat localStorage helpers
   stores/                  Zustand app state
 docs/
-  design-decisions.md      Architecture and change log
+  design-decisions.md      Architecture decisions and change log
 ```
 
 ## Environment
 
-Create `.env.local` in the project root.
+Create `.env.local` in the project root:
 
 ```env
 # OmniClaw backend/proxy targets
 OMNICLAW_BACKEND_URL=http://localhost:8090
 OMNICLAW_API_URL=http://localhost:8080
 
-# Token accepted by the OmniClaw API service.
-# OMNICLAW_AGENT_TOKEN is also supported.
+# Token accepted by the OmniClaw API service
+# OMNICLAW_AGENT_TOKEN is also supported
 OMNICLAW_API_TOKEN=your_omniclaw_token
 
 # Optional ArcScan endpoint override
 ARCSCAN_API_URL=https://testnet.arcscan.app/api
 
-# AI providers
+# AI providers — configure at least one for provider-backed planning
 GEMINI_API_KEY=your_gemini_key
 GEMINI_MODEL=gemini-2.5-flash,gemini-2.0-flash
 
@@ -140,76 +261,58 @@ AIVML_MODEL=gpt-4o-mini,mistral-small
 AIVML_BASE_URL=https://api.aimlapi.com/v1
 ```
 
-At least one AI provider should be configured for provider-backed planning. The fallback planner can still handle supported prompt patterns when provider planning is unavailable.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `OMNICLAW_API_URL` | Yes | OmniClaw API service (inspect/pay) |
+| `OMNICLAW_API_TOKEN` or `OMNICLAW_AGENT_TOKEN` | Yes | Auth for OmniClaw API |
+| `OMNICLAW_BACKEND_URL` | Yes | Wallet/balance/activity proxy backend |
+| `GEMINI_API_KEY` / `FEATHERLESS_API_KEY` / `AIVML_API_KEY` | One of | AI-backed plan generation |
+| `ARCSCAN_API_URL` | No | ArcScan API override |
 
-## Quick Start
-
-```powershell
-pnpm install
-pnpm dev
-```
-
-Open:
-
-```text
-http://localhost:3000
-```
-
-For production checks:
-
-```powershell
-pnpm typecheck
-pnpm lint
-pnpm build
-```
+The fallback planner handles supported prompt patterns when no AI provider is configured.
 
 ## Scripts
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm dev` | Start the Next.js dev server with Turbopack. |
-| `pnpm build` | Build the production app. |
-| `pnpm start` | Start the production server after a build. |
-| `pnpm lint` | Run ESLint. |
-| `pnpm typecheck` | Run TypeScript without emitting files. |
-| `pnpm format` | Format TypeScript and TSX files with Prettier. |
+| `pnpm dev` | Start the Next.js dev server with Turbopack |
+| `pnpm build` | Build the production app |
+| `pnpm start` | Start the production server after a build |
+| `pnpm lint` | Run ESLint |
+| `pnpm typecheck` | Run TypeScript without emitting files |
+| `pnpm format` | Format TypeScript and TSX files with Prettier |
 
-## API Catalog
+## API catalog
 
-The paid tool catalog lives in `lib/agent/api-catalog.ts`. It defines:
+Paid tools are defined in `lib/agent/api-catalog.ts`. Each entry includes:
 
-- tool id and display name
-- domain/category
-- endpoint URL
-- HTTP method
-- price in USDC
-- aliases for fallback matching
-- input schema and output example
-- payment and allowlist flags
+- Tool id, display name, and skill category
+- Endpoint path and HTTP method
+- Price in USDC
+- Parameter schema (for planner input population)
+- Aliases for fallback keyword matching
+- `allowlisted` flag — only `true` tools can execute
 
-Visible service metadata and prompt suggestions come from `agent-skills/*/data.json` through `lib/services/skill-catalog.ts`.
+To add a new tool: register the endpoint in `lib/omniclaw/services.ts`, add a catalog entry with `allowlisted: true`, and optionally extend `agent-skills/<skill>/data.json` for UI metadata.
 
-## Payment And Execution Notes
+## Payment and execution
 
-- Planning is separate from execution.
-- The UI requires user confirmation before calling `/api/agent/execute-plan`.
-- Execution validates that each tool is allowlisted.
-- Inspect and pay are routed through `/api/omniclaw/inspect` and `/api/omniclaw/pay`.
-- Gateway activity can show payments, deposits, withdrawals, transaction ids, and ArcScan links.
-- The final answer is based on API results; payment/activity details are handled by the console UI rather than being the core answer content.
+- **Planning is separate from execution** — `/api/agent/plan` never charges.
+- **User confirmation is mandatory** — the UI only calls `/api/agent/execute-plan` after approval.
+- **Allowlist enforcement** — execution rejects tools not marked `allowlisted: true`.
+- **Inspect then pay** — routes through `/api/omniclaw/inspect` and `/api/omniclaw/pay`.
+- **Transparent UI** — payment and activity details surface in the console; the streamed answer focuses on API results.
 
 ## Troubleshooting
 
 ### Dev server lock
-
-If the dev server reports a stale lock:
 
 ```powershell
 Remove-Item -Recurse -Force .next\dev\lock
 pnpm dev
 ```
 
-If port 3000 is occupied:
+### Port 3000 in use
 
 ```powershell
 netstat -ano | findstr :3000
@@ -218,44 +321,34 @@ taskkill /PID <pid> /F
 
 ### OmniClaw auth errors
 
-Check that one of these is set:
+Verify one of these is set and matches your running OmniClaw service:
 
 ```env
 OMNICLAW_API_TOKEN=...
 OMNICLAW_AGENT_TOKEN=...
 ```
 
-Also confirm `OMNICLAW_API_URL` points to the running OmniClaw service.
+Confirm `OMNICLAW_API_URL` points to the OmniClaw API (default `http://localhost:8080`).
 
 ### Backend proxy unavailable
 
-Routes that use `app/api/omniclaw/_proxy.ts` call `OMNICLAW_BACKEND_URL`, defaulting to:
+Wallet and activity routes proxy to `OMNICLAW_BACKEND_URL` (default `http://localhost:8090`). Start that backend or update the variable.
 
-```text
-http://localhost:8090
-```
+### Empty model selector
 
-Start that backend or update `OMNICLAW_BACKEND_URL`.
-
-### Model selector is empty
-
-Set at least one provider key:
-
-```env
-GEMINI_API_KEY=...
-FEATHERLESS_API_KEY=...
-AIVML_API_KEY=...
-```
-
-Then restart `pnpm dev`.
+Set at least one provider key (`GEMINI_API_KEY`, `FEATHERLESS_API_KEY`, or `AIVML_API_KEY`) and restart `pnpm dev`.
 
 ## Documentation
 
-- `docs/design-decisions.md` tracks architecture decisions and meaningful changes.
-- `docs/api-catalog.md` documents how paid API tools are represented.
-- `docs/frontend-architecture.md` contains frontend architecture notes.
-- `docs/environment-setup.md` contains additional environment setup details.
+- [`docs/design-decisions.md`](docs/design-decisions.md) — architecture decisions and change log
+
+### Hackathon and partner resources
+
+- [Agentic Economy on Arc — lablab.ai](https://lablab.ai/ai-hackathons/nano-payments-arc)
+- [Arc documentation](https://docs.arc.network/)
+- [Circle Nanopayments documentation](https://developers.circle.com/)
+- [AIsa API skills](https://aisa.one)
 
 ## License
 
-Built for the Arc Economy Hackathon.
+Built for the [Agentic Economy on Arc](https://lablab.ai/ai-hackathons/nano-payments-arc) hackathon.
